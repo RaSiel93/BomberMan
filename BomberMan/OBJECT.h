@@ -5,7 +5,7 @@
 #include <vector>
 using namespace std;
 #include <iostream>
-
+#include <string>
 #include <GL\glut.h>
 
 #define ob_size 40
@@ -48,20 +48,33 @@ public:
 
 class BOMB: public OBJECT{
 public:
+	BOMB(){}
 	BOMB( int x, int y );
 	int getTimer();
 	void setTimer();
 	void Draw();
+protected:
 	int timer;
 };
 
-class FIRE: public OBJECT{
+class FIRE: public BOMB {
 public:
 	FIRE( int x, int y );
 	void Draw();
 };
 
-class MONSTER_1: public OBJECT{
+class MONSTER: public OBJECT{
+public:
+	virtual void Draw() = 0;
+	int GetSpeed();
+	void SetSpeed();
+	bool MoveTo( OBJECT *object[area_h * area_w] );
+protected:
+	int speed;
+	int speed_const;
+};
+
+class MONSTER_1: public MONSTER{
 public:
 	MONSTER_1( int y, int x );
 	void Draw();
