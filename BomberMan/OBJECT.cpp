@@ -78,7 +78,7 @@ void BOMB::Draw(){
 //FIRE
 FIRE::FIRE( int x, int y ){
 	setPos( x, y );
-	timer = 30;
+	timer = 50;
 }
 void FIRE::Draw(){		
 	glColor3f(1.0, 1.0, 0.0);
@@ -97,7 +97,9 @@ int MONSTER::GetSpeed(){
 void MONSTER::SetSpeed(){
 	speed--;
 }
-bool MONSTER::MoveTo( OBJECT *object[area_h * area_w] ){
+
+template <typename T, size_t Cols, size_t Rows>//<------------------------------------------------
+bool MONSTER::MoveTo( OBJECT (&object)[area_h * area_w] ){
 	if( speed != 0 )
 		SetSpeed();
 	else {

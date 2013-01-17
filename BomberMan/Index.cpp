@@ -18,6 +18,8 @@ PROCESS *game = new PROCESS;
 void Draw(){
 	glClear(GL_COLOR_BUFFER_BIT);
 	
+	game->Print();
+	
 	for( int i = 0; i < game->bomb.size(); i++ ){
 		game->bomb[i]->setTimer();
 		if( game->bomb[i]->getTimer() == 0 ){
@@ -25,13 +27,14 @@ void Draw(){
 		}
 	}
 	for( int i = 0; i < game->moob.size(); i++ )
-		//game->moob[i]->MoveTo( game->object );
-	for( int i = 0; i < game->fire.size(); )
+		game->moob[i]->MoveTo( game->object );//<------------------------------------------------
+	for( int i = 0; i < game->fire.size(); i++ ){
+		game->fire[i]->Draw();
 		if( game->fire[i]->getTimer() == 0 )
 			game->Destroy( game->fire[i]->getPos().first, game->fire[i]->getPos().second );
 		else game->fire[i]->setTimer();
+	}
 
-	game->Print();
 	glutSwapBuffers();
 }
 

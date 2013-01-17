@@ -16,7 +16,7 @@ bool PROCESS::GetObject( string type, int pattern, string able  ){
 			int y = rand()%area_h, x = rand()%area_w;
 			if( object[ y * area_w + x ] == 0 && !( y < 5 && x < 5 ) ){
 				moob.push_back( new MONSTER_1( y, x ) );
-				object[ y * area_w + x ] = moob.front();
+				object[ y * area_w + x ] = moob.back();
 				i++;
 			}
 		}
@@ -92,7 +92,12 @@ bool PROCESS::BigBang( int y, int x ){
 			fire.push_back( new FIRE( y, x ) );
 			return true;
 		}
-		if( Passage( y, x ) == "class BRICK" || Passage( y, x ) == "class BOMB" ){
+		if( Passage( y, x ) == "class BRICK" ){
+			fire.push_back( new FIRE( y, x ) );
+			return false;
+		}
+		if( Passage( y, x ) == "class BOMB" ){
+			BangBomb( FindBomb( y, x ) );	
 			fire.push_back( new FIRE( y, x ) );
 			return false;
 		}
@@ -112,7 +117,7 @@ bool PROCESS::Destroy( int y, int x ){
 		moob.erase( moob.begin() + FindMonster( y, x ) );
 	}
 	if( Passage( y, x ) != "" ){
-		delete object[ y * area_h + x ];
+		delete object[ y * area_w + x ];
 		object[ y * area_w + x ] = 0;
 	}
 	fire.erase( fire.begin() + FindFire( y, x ) );

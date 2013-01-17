@@ -68,7 +68,7 @@ public:
 	virtual void Draw() = 0;
 	int GetSpeed();
 	void SetSpeed();
-	bool MoveTo( OBJECT *object[area_h * area_w] );
+	bool MoveTo( OBJECT (&object)[area_h * area_w] );//<------------------------------------------------
 protected:
 	int speed;
 	int speed_const;
