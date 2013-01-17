@@ -9,7 +9,7 @@ PROCESS::PROCESS(){
 }
 bool PROCESS::GetObject( string type, int pattern, string able  ){
 	if( type == "PLAYER" ){
-		player = new PLAYER( 0, 0 );
+		player = new PLAYER( pattern, pattern );
 	}
 	if( type == "MONSTER_1" ){
 		for( int i = 0; i < pattern; ){
@@ -28,7 +28,6 @@ bool PROCESS::GetObject( string type, int pattern, string able  ){
 		for( int i = 1; i < area_h; i += pattern ){
 			for( int j = 1; j < area_w; j += pattern ){
 				map_object[ i ][ j ] = new BLOCK( i, j );
-				//if( i%2 - 1 == 0 && j%2 - 1 == 0 && i && j ) cell[ i ][ j ] = 4;
 			}
 		}
 	}
@@ -55,8 +54,8 @@ void PROCESS::Print(){
 }
 void PROCESS::ClearObject( int y, int x ){
 	//cursor_to_global( y*object_h, x*object_w );
-	for( int i = 0; i < object_h; i++ ){
-		for( int j = 0; j < object_w; j++ )
+	for( int i = 0; i < ob_size; i++ ){
+		for( int j = 0; j < ob_size; j++ )
 			cout << " ";
 		//cursor_to( 1, -object_w );
 	}
@@ -64,8 +63,8 @@ void PROCESS::ClearObject( int y, int x ){
 void PROCESS::FireDraw( int y, int x ){
 	//cursor_to_global( y*object_h, x*object_w );
 	//setColor( 12, 0 );
-	for( int i = 0; i < object_h; i++ ){
-		for( int j = 0; j < object_w; j++ )
+	for( int i = 0; i < ob_size; i++ ){
+		for( int j = 0; j < ob_size; j++ )
 			cout << rand()%10;
 		//cursor_to( 1, -object_w );
 	}
@@ -73,11 +72,11 @@ void PROCESS::FireDraw( int y, int x ){
 bool PROCESS::PlayerMoveTo( int y, int x ){
 	string type = Passage( y = player->getPos().first + y, x = player->getPos().second + x );
 	if( type == "" ){	
-		if( !map_object[player->getPos().first][player->getPos().second] ) {
-			ClearObject( player->getPos().first, player->getPos().second );	
-		}
+		//if( !map_object[player->getPos().first][player->getPos().second] ) {
+			//ClearObject( player->getPos().first, player->getPos().second );	
+		//}
 		player->setPos( y, x );
-		player->Draw();
+		//player->Draw();
 		//cursor_to_global( 0, 0 );
 		return true;
 	}
@@ -180,13 +179,13 @@ bool PROCESS::MoobsMoveTo(){
 		}
 		string type = Passage( y = moobs_position[i].first + y, x = moobs_position[i].second + x );
 		if( type == "" ){
-			ClearObject( moobs_position[i].first, moobs_position[i].second );
+			//ClearObject( moobs_position[i].first, moobs_position[i].second );
 			map_object[y][x] = map_object[moobs_position[i].first][moobs_position[i].second];
 			map_object[moobs_position[i].first][moobs_position[i].second] = 0;
 			map_object[y][x]->setPos(y,x);
 			moobs_position[i].first = y;
 			moobs_position[i].second = x;
-			map_object[y][x]->Draw();
+			//map_object[y][x]->Draw();
 			//cursor_to_global( 0, 0 );
 		}
 	}

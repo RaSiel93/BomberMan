@@ -6,10 +6,13 @@
 using namespace std;
 #include <iostream>
 
-//#include "index.cpp"
+#include <GL\glut.h>
 
-#define object_h 7
-#define object_w 9
+#define ob_size 40
+#define area_h 15
+#define area_w 31
+
+//#include "index.cpp"
 
 class OBJECT{
 public:

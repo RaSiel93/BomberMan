@@ -1,37 +1,32 @@
 //#pragma comment (lib, "kernel32.lib")
 #include <math.h>
 
-//#include "OBJECT.h"
-#include "PROCESS.h"
-
 #include <vector>
 #include <time.h>
 using namespace std;
 #include <conio.h>
 
+#include "PROCESS.h"
 #include <GL\glut.h>
 
-float WinWid = 400.0;
-float WinHei = 400.0;
-float Angle=0.0, Scale = 1.0;
+#define ob_size 40
+#define area_h 15
+#define area_w 31
+
+PROCESS *game = new PROCESS;
 
 void Draw(){
 	glClear(GL_COLOR_BUFFER_BIT);
-	glPushMatrix();
-	Scale = 1.0 - abs(sin(3.14*Angle/90.0)/sqrt(3.0)/2);
-	glRotatef(Angle, 0.0, 0.0, 1.0);
-	glScalef(Scale, Scale, 1);
-	glBegin(GL_LINES);
-		for(float i = -WinWid/2; i <= WinWid/2; i += 20.0){
-			glVertex2f(i, -WinHei/2);
-			glVertex2f(i, WinHei/2);
+	
+	for( int i = 0; i < game->bomb.size(); i++ ){
+		game->bomb[i]->setTimer();
+		if( game->bomb[i]->getTimer() == 0 ){
+			game->BangBomb( i );
 		}
-		for(float i = -WinHei/2; i <= WinHei/2; i += 20.0){
-			glVertex2f(-WinWid/2, i);
-			glVertex2f(WinWid/2, i);
-		}
-	glEnd();
-	glPopMatrix();
+	}
+
+	game->Print();
+	game->MoobsMoveTo();
 	glutSwapBuffers();
 }
 
@@ -49,30 +44,27 @@ void Timer(int value){
 
 void Keyboard(unsigned char  key, int x, int y){
 	switch(key){
-	case 'a': Angle++;
-		break;
-	case 'd': Angle--;
+	case 32: game->PushBomb();
 		break;
 	}
 }
 void SKeyboard(int key, int x, int y){
 	switch(key){
-	case GLUT_KEY_LEFT: Angle++;
-		break;
-	case GLUT_KEY_RIGHT: Angle--;
-		break;
+	case GLUT_KEY_LEFT: game->PlayerMoveTo( 0, -1 ); break;
+	case GLUT_KEY_RIGHT: game->PlayerMoveTo( 0, 1 ); break;
+	case GLUT_KEY_UP: game->PlayerMoveTo( -1, 0 ); break;
+	case GLUT_KEY_DOWN: game->PlayerMoveTo( 1, 0 ); break;
 	}
 }
-
 void Initialize(){
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(-WinWid/2, WinWid/2, -WinHei/2, WinHei/2, -200.0, 200.0 );
+	glOrtho( -ob_size*area_w/2, ob_size*area_w/2,-ob_size*area_h/2, ob_size*area_h/2, -200.0, 200.0);
 	glMatrixMode(GL_MODELVIEW);
 }
-
-/*void cursor_to_global( SHORT yPos, SHORT xPos ){
+/*
+void cursor_to_global( SHORT yPos, SHORT xPos ){
 	COORD curPos;
 	curPos.X = xPos;
 	curPos.Y = yPos;
@@ -103,12 +95,18 @@ int main(int argc, char** argv){
     SetConsoleFont(GetStdHandle(STD_OUTPUT_HANDLE),0);
 	SetWindowPos( GetForegroundWindow(), 0, 20, 20, 0, 0, SWP_SHOWWINDOW );
 	system("mode con cols=320 lines=110");*/
-    
+
+	game->GetObject( "PLAYER", 0, "" );
+	game->GetObject( "BLOCK", 2, "NO_RANDOM" );
+	game->GetObject( "BRICK", area_h*area_w/2, "RANDOM" );
+	game->GetObject( "MONSTER_1", 5, "RANDOM" );
+	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB); 
-	glutInitWindowSize( 800.0, 450.0 );
-	glutInitWindowPosition( 100.0, 100.0 );
-	glutCreateWindow("Lesson 4");
+	glutInitWindowSize( ob_size * area_w, ob_size * area_h );//ob_size*area_w, ob_size*area_h );
+	glutInitWindowPosition( 50.0, 50.0 );
+	glutCreateWindow("Bomberman with OpenGl");
+	
 	glutDisplayFunc(Draw);
 	
 	glutTimerFunc(500, Timer, 0);
@@ -117,12 +115,7 @@ int main(int argc, char** argv){
 	Initialize();
 	glutMainLoop();
 
-	PROCESS *area = new PROCESS;
-	area->GetObject( "PLAYER", 0, "" );
-	area->GetObject( "BLOCK", 2, "NO_RANDOM" );
-	area->GetObject( "BRICK", 100, "RANDOM" );
-	area->GetObject( "MONSTER_1", 5, "RANDOM" );
-	area->Print();
+
 
 	/*int time = 0;
 	vector< pair< int, int > > bomba;

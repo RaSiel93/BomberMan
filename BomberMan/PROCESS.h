@@ -1,8 +1,6 @@
 #ifndef PROCES_H
 #define PROCES_H
 
-#define area_h 15
-#define area_w 35
 #define col_mobs 5
 #define strength 2
 
@@ -10,6 +8,11 @@
 #include <vector>
 using namespace std;
 
+#define ob_size 40
+#define area_h 15
+#define area_w 31
+
+//#include "Index.cpp"
 #include "OBJECT.h"
 
 class PROCESS{
