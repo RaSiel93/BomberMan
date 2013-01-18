@@ -20,14 +20,17 @@ void Draw(){
 	
 	game->Print();
 	
-	for( int i = 0; i < game->bomb.size(); i++ ){
-		game->bomb[i]->setTimer();
-		if( game->bomb[i]->getTimer() == 0 ){
+	for( int i = 0; i < game->bomb.size(); i++ )
+		if( game->bomb[i]->getTimer() == 0 )
 			game->BangBomb( i );
-		}
-	}
+		else game->bomb[i]->setTimer();
+
+		
 	for( int i = 0; i < game->moob.size(); i++ )
-		game->moob[i]->MoveTo( game->object );//<------------------------------------------------
+		if( game->moob[i]->GetSpeed() == 0 )
+			game->MoobMoveTo( i );
+		else game->moob[i]->SetSpeed();
+
 	for( int i = 0; i < game->fire.size(); i++ ){
 		game->fire[i]->Draw();
 		if( game->fire[i]->getTimer() == 0 )
@@ -70,9 +73,11 @@ int main(int argc, char** argv){
 	
 	game->GetObject( "PLAYER", 0, "" );
 	game->GetObject( "BLOCK", 2, "NO_RANDOM" );
-	game->GetObject( "BRICK", area_h*area_w/2, "RANDOM" );
+	game->GetObject( "BRICK", area_h*area_w/3, "RANDOM" );
 	game->GetObject( "MONSTER_1", 5, "RANDOM" );
-	
+	game->GetObject( "MONSTER_2", 3, "RANDOM" );
+	game->GetObject( "MONSTER_3", 1, "RANDOM" );
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB); 
 	glutInitWindowSize( ob_size * area_w, ob_size * area_h );//ob_size*area_w, ob_size*area_h );

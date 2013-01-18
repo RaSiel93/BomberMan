@@ -29,7 +29,7 @@ public:
 	int FindFire( int y, int x );
 	int FindBomb( int y, int x );
 	int FindMonster( int y, int x );
-	bool MoobsMoveTo();
+	bool MoobMoveTo( int i );
 	string Passage( int y, int x );
 
 	OBJECT *object[ area_h * area_w ];

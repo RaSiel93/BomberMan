@@ -21,6 +21,26 @@ bool PROCESS::GetObject( string type, int pattern, string able  ){
 			}
 		}
 	}
+	if( type == "MONSTER_2" ){
+		for( int i = 0; i < pattern; ){
+			int y = rand()%area_h, x = rand()%area_w;
+			if( object[ y * area_w + x ] == 0 && !( y < 5 && x < 5 ) ){
+				moob.push_back( new MONSTER_2( y, x ) );
+				object[ y * area_w + x ] = moob.back();
+				i++;
+			}
+		}
+	}
+	if( type == "MONSTER_3" ){
+		for( int i = 0; i < pattern; ){
+			int y = rand()%area_h, x = rand()%area_w;
+			if( object[ y * area_w + x ] == 0 && !( y < 5 && x < 5 ) ){
+				moob.push_back( new MONSTER_3( y, x ) );
+				object[ y * area_w + x ] = moob.back();
+				i++;
+			}
+		}
+	}
 	if( type == "BLOCK" && able == "NO_RANDOM" ){ 
 		for( int i = 1; i < area_h; i += pattern ){
 			for( int j = 1; j < area_w; j += pattern ){
@@ -101,7 +121,8 @@ bool PROCESS::BigBang( int y, int x ){
 			fire.push_back( new FIRE( y, x ) );
 			return false;
 		}
-		if( Passage( y, x ) == "class MONSTER_1" ){
+		if( Passage( y, x ) == "class MONSTER_1" || Passage( y, x ) == "class MONSTER_2" || Passage( y, x ) == "class MONSTER_3" ){
+			moob.erase( moob.begin() + FindMonster( y, x ) );
 			fire.push_back( new FIRE( y, x ) );
 			return true;
 		}
@@ -113,10 +134,10 @@ bool PROCESS::Destroy( int y, int x ){
 		BangBomb( FindBomb( y, x ) );
 		return true;
 	}
-	if( Passage( y, x ) == "class MONSTER_1" ){
-		moob.erase( moob.begin() + FindMonster( y, x ) );
-	}
-	if( Passage( y, x ) != "" ){
+	//if( Passage( y, x ) == "class MONSTER_1" ||  Passage( y, x ) == "class MONSTER_2" ||  Passage( y, x ) == "class MONSTER_3" ){
+	//	moob.erase( moob.begin() + FindMonster( y, x ) );
+	//}
+	if( Passage( y, x ) != "" && Passage( y, x ) != "PLAYER" ){
 		delete object[ y * area_w + x ];
 		object[ y * area_w + x ] = 0;
 	}
@@ -141,9 +162,51 @@ int PROCESS::FindMonster( int y, int x ){
 			return i;
 	return 0;
 }
+bool PROCESS::MoobMoveTo( int i ){
+	bool way[4];
+	int course = -1, count_way = 0, course_inverse = -1;
+
+	if( moob[i]->course%2 ) course_inverse = moob[i]->course - 1;
+	else course_inverse = moob[i]->course + 1;
+
+	for( int k = 0; k < 4; k++ )
+		way[k] = false;
+	if( Passage( moob[i]->getPos().first - 1, moob[i]->getPos().second ) == "" ){ way[0] = true; count_way++; }
+	if( Passage( moob[i]->getPos().first + 1, moob[i]->getPos().second ) == "" ){ way[1] = true; count_way++; }
+	if( Passage( moob[i]->getPos().first, moob[i]->getPos().second - 1 ) == "" ){ way[2] = true; count_way++; }
+	if( Passage( moob[i]->getPos().first, moob[i]->getPos().second + 1 ) == "" ){ way[3] = true; count_way++; }
+
+	if( !count_way ) return false;
+	if( way[moob[i]->course] && rand()%3 ) course = moob[i]->course;
+	if( count_way == 1 ) 
+		for( int k = 0; k < 4; k++ )
+			if( way[k] == true ) course = k;
+	while( course == -1 ){
+		int s = rand()%4;
+		if( way[s] && s != course_inverse ) course = s;
+	}
+
+	int x=0, y=0, v = -1;
+	if( course%2 ) v = 1;
+	if( course < 2 ) y += v;
+	else x += v;
+	
+	y += moob[i]->getPos().first;
+	x += moob[i]->getPos().second;
+	
+	object[y * area_w + x] = object[moob[i]->getPos().first * area_w + moob[i]->getPos().second];
+	object[moob[i]->getPos().first * area_w + moob[i]->getPos().second] = 0;
+	object[y * area_w + x]->setPos( y, x );
+	moob[i]->ResetSpeed();
+	moob[i]->course = course;
+	
+return true;
+}
 string PROCESS::Passage( int y, int x ){ 
 	if( x < 0 || x >= area_w || y < 0 || y >= area_h )
 		return "end";
+	/*if( player->getPos().first == y && player->getPos().second == x )
+		return "PLAYER";*/
 	if( object[ y * area_w + x ] == 0 )
 		return "";
 	return typeid( *object[ y * area_w + x ] ).name();

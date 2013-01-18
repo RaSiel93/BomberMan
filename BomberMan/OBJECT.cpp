@@ -78,7 +78,7 @@ void BOMB::Draw(){
 //FIRE
 FIRE::FIRE( int x, int y ){
 	setPos( x, y );
-	timer = 50;
+	timer = 10;
 }
 void FIRE::Draw(){		
 	glColor3f(1.0, 1.0, 0.0);
@@ -97,37 +97,47 @@ int MONSTER::GetSpeed(){
 void MONSTER::SetSpeed(){
 	speed--;
 }
-
-template <typename T, size_t Cols, size_t Rows>//<------------------------------------------------
-bool MONSTER::MoveTo( OBJECT (&object)[area_h * area_w] ){
-	if( speed != 0 )
-		SetSpeed();
-	else {
-		int x=0, y=0, xy=0;
-		while( !(x + y) ) {
-			x = rand()%3 - 1;
-			y = rand()%3 - 1;
-			xy = rand()%2;
-			if( xy ) x = 0;
-			else y = 0;
-		}
-		if( object[y * area_w + x] == 0 ){
-			object[y * area_w + x] = object[position.first * area_h + position.second];
-			object[position.first * area_w + position.second] = 0;
-			object[y * area_w + x]->setPos(y,x);
-			speed = speed_const;
-		}
-		return true;
-	}
-	return false;
+void MONSTER::ResetSpeed(){
+	speed = speed_const;
 }
 MONSTER_1::MONSTER_1( int y, int x ){
 	setPos( y, x );
-	speed_const = 30;
+	speed_const = 10;
+	course = rand()%4;
 	speed = speed_const;
 }
 void MONSTER_1::Draw(){
 	glColor3f(1.0, 0.0, 0.0);
+	glBegin(GL_QUADS);	
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glEnd();
+}
+MONSTER_2::MONSTER_2( int y, int x ){
+	setPos( y, x );
+	speed_const = 7;
+	course = rand()%4;
+	speed = speed_const;
+}
+void MONSTER_2::Draw(){
+	glColor3f(0.0, 1.0, 1.0);
+	glBegin(GL_QUADS);	
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glEnd();
+}
+MONSTER_3::MONSTER_3( int y, int x ){
+	setPos( y, x );
+	speed_const = 5;
+	course = rand()%4;
+	speed = speed_const;
+}
+void MONSTER_3::Draw(){
+	glColor3f(1.0, 1.0, 0.0);
 	glBegin(GL_QUADS);	
 		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
 		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);

@@ -68,16 +68,26 @@ public:
 	virtual void Draw() = 0;
 	int GetSpeed();
 	void SetSpeed();
-	bool MoveTo( OBJECT (&object)[area_h * area_w] );//<------------------------------------------------
+	void ResetSpeed();	
+	//bool MoveTo( OBJECT (*object)[area_h * area_w] );//<------------------------------------------------
+	int course;
 protected:
 	int speed;
 	int speed_const;
 };
-
 class MONSTER_1: public MONSTER{
 public:
 	MONSTER_1( int y, int x );
 	void Draw();
 };
-
+class MONSTER_2: public MONSTER{
+public:
+	MONSTER_2( int y, int x );
+	void Draw();
+};
+class MONSTER_3: public MONSTER{
+public:
+	MONSTER_3( int y, int x );
+	void Draw();
+};
 #endif // OBJECT_H
