@@ -1,17 +1,7 @@
-//#pragma comment (lib, "kernel32.lib")
-#include <math.h>
-
-#include <vector>
 #include <time.h>
-using namespace std;
-#include <conio.h>
-
+#include "SERVICE.h"
 #include "PROCESS.h"
 #include <GL\glut.h>
-
-#define ob_size 40
-#define area_h 15
-#define area_w 31
 
 PROCESS *game = new PROCESS;
 
@@ -20,26 +10,17 @@ void Draw(){
 	
 	game->Print();
 	
-	for( int i = 0; i < game->bomb.size(); i++ )
-		if( game->bomb[i]->getTimer() == 0 )
-			game->BangBomb( i );
-		else game->bomb[i]->setTimer();
-
+	game->BombTime();
 		
-	for( int i = 0; i < game->moob.size(); i++ )
-		if( game->moob[i]->GetSpeed() == 0 )
-			game->MoobMoveTo( i );
-		else game->moob[i]->SetSpeed();
+	game->MoveMoobs();
 
-	for( int i = 0; i < game->fire.size(); i++ ){
-		game->fire[i]->Draw();
-		if( game->fire[i]->getTimer() == 0 )
-			game->Destroy( game->fire[i]->getPos().first, game->fire[i]->getPos().second );
-		else game->fire[i]->setTimer();
-	}
+	game->DestroyFire();
 
 	glutSwapBuffers();
-}
+
+	if( game->EndGame() ) 
+		exit(0);
+ }
 
 void Timer(int value){
 	glutPostRedisplay();
@@ -54,10 +35,10 @@ void Keyboard(unsigned char  key, int x, int y){
 }
 void SKeyboard(int key, int x, int y){
 	switch(key){
-	case GLUT_KEY_LEFT: game->PlayerMoveTo( 0, -1 ); break;
-	case GLUT_KEY_RIGHT: game->PlayerMoveTo( 0, 1 ); break;
-	case GLUT_KEY_UP: game->PlayerMoveTo( -1, 0 ); break;
-	case GLUT_KEY_DOWN: game->PlayerMoveTo( 1, 0 ); break;
+	case GLUT_KEY_LEFT: game->MovePlayer( "LEFT" ); break;
+	case GLUT_KEY_RIGHT: game->MovePlayer( "RIGHT" ); break;
+	case GLUT_KEY_UP: game->MovePlayer( "UP" ); break;
+	case GLUT_KEY_DOWN: game->MovePlayer( "DOWN" ); break;
 	}
 }
 void Initialize(){
@@ -70,13 +51,15 @@ void Initialize(){
 
 int main(int argc, char** argv){
 	srand( time(0) );
-	
-	game->GetObject( "PLAYER", 0, "" );
-	game->GetObject( "BLOCK", 2, "NO_RANDOM" );
-	game->GetObject( "BRICK", area_h*area_w/3, "RANDOM" );
-	game->GetObject( "MONSTER_1", 5, "RANDOM" );
-	game->GetObject( "MONSTER_2", 3, "RANDOM" );
-	game->GetObject( "MONSTER_3", 1, "RANDOM" );
+
+	start:
+
+	game->GetObject( "PLAYER", 0, 0 );
+	game->GetObject( "BLOCK", 2 );
+	game->GetObject( "BRICK", area_h*area_w/3, "RANDOM", 1, 1 );
+	game->GetObject( "MOOB_1", 10, "RANDOM", 5, 5 );
+	game->GetObject( "MOOB_2", 3, "RANDOM", 5, 5 );
+	game->GetObject( "MOOB_3", 1, "RANDOM", 5, 5 );
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB); 

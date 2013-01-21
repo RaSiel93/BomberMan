@@ -1,213 +1,285 @@
 #include "PROCESS.h"
 
 PROCESS::PROCESS(){
-	for( int i = 0; i < area_h; i++ ){
-		for( int j = 0; j < area_w; j++ ){
-			object[ i * area_w + j ] = 0;
+	type.push_back("PLAYER");
+	type.push_back("BLOCK");
+	type.push_back("BRICK");
+	type.push_back("BOMB");
+	type.push_back("FIRE");
+	type.push_back("MOOB");
+}
+void PROCESS::GetObject( string temp, int y, int x ){
+	if( temp == type[0] ){
+		player.push_back( new PLAYER( y, x ) );
+	}
+	if( temp == type[1] ){
+		block.push_back( new BLOCK( y, x ) );
+	}
+	if( temp == type[2] ){
+		brick.push_back( new BRICK( y, x ) );
+	}
+	if( temp == type[3] ){
+		bomb.push_back( new BOMB( y, x ) );
+	}
+	if( temp == type[4] ){
+		fire.push_back( new FIRE( y, x ) );
+	}
+	if( temp == "MOOB_1" ){
+		moob.push_back( new MOOB_1( y, x ) );
+	}
+	if( temp == "MOOB_2" ){
+		moob.push_back( new MOOB_2( y, x ) );
+	}
+	if( temp == "MOOB_3" ){
+		moob.push_back( new MOOB_3( y, x ) );
+	}
+}
+void PROCESS::GetObject( string temp, int amount, string able, int border_y, int border_x ){
+	for_each( i ){
+		if( temp == type[i] || temp == "MOOB_1" || temp == "MOOB_2" || temp == "MOOB_3" ){
+			for( int j = 0; j < amount; ){
+				int y = rand()%area_h, x = rand()%area_w;
+				if( border_y < y || border_x < x )
+					if( ObjectIdentification( y, x ) == "" ){
+						GetObject( temp, y, x );
+						j++;
+					}
+			}
+			return;
 		}
 	}
 }
-bool PROCESS::GetObject( string type, int pattern, string able  ){
-	if( type == "PLAYER" ){
-		player = new PLAYER( pattern, pattern );
+void PROCESS::GetObject( string temp, int construction ){
+	for( int y = 1; y < area_h; y += 2 ){
+		for( int x = 1; x < area_w; x += 2 )
+			GetObject( temp, y, x );
 	}
-	if( type == "MONSTER_1" ){
-		for( int i = 0; i < pattern; ){
-			int y = rand()%area_h, x = rand()%area_w;
-			if( object[ y * area_w + x ] == 0 && !( y < 5 && x < 5 ) ){
-				moob.push_back( new MONSTER_1( y, x ) );
-				object[ y * area_w + x ] = moob.back();
-				i++;
-			}
-		}
-	}
-	if( type == "MONSTER_2" ){
-		for( int i = 0; i < pattern; ){
-			int y = rand()%area_h, x = rand()%area_w;
-			if( object[ y * area_w + x ] == 0 && !( y < 5 && x < 5 ) ){
-				moob.push_back( new MONSTER_2( y, x ) );
-				object[ y * area_w + x ] = moob.back();
-				i++;
-			}
-		}
-	}
-	if( type == "MONSTER_3" ){
-		for( int i = 0; i < pattern; ){
-			int y = rand()%area_h, x = rand()%area_w;
-			if( object[ y * area_w + x ] == 0 && !( y < 5 && x < 5 ) ){
-				moob.push_back( new MONSTER_3( y, x ) );
-				object[ y * area_w + x ] = moob.back();
-				i++;
-			}
-		}
-	}
-	if( type == "BLOCK" && able == "NO_RANDOM" ){ 
-		for( int i = 1; i < area_h; i += pattern ){
-			for( int j = 1; j < area_w; j += pattern ){
-				object[ i * area_w + j ] = new BLOCK( i, j );
-			}
-		}
-	}
-	if( type == "BRICK" && able == "RANDOM"){
-		for( int i = 0; i < pattern; ){
-			int y = rand()%area_h, x = rand()%area_w;
-			if( object[ y * area_w + x ] == 0 && !( y < 2 && x < 2 ) ){
-				object[ y * area_w + x ] = new BRICK( y, x );
-				i++;
-			}
-		}
-	}
-	return true;
 }
 void PROCESS::Print(){
-	player->Draw();
-	for( int i = 0; i < area_h; i++ ){
-		for( int j = 0; j < area_w; j++ ){
-			if( object[ i * area_w + j ] != 0 ){
-				object[ i * area_w + j ]->Draw();
-			}
+	for_each( i ){
+		Draw( type[i] );
+	}
+}
+void PROCESS::Draw( string temp ){
+	if( temp == type[0] ){
+		for( int j = 0; j < player.size(); j++ ){
+			player[j]->Draw();
+		}
+	}
+	if( temp == type[1] ){
+		for( int j = 0; j < block.size(); j++ ){
+			block[j]->Draw();
+		}
+	}
+	if( temp == type[2] ){
+		for( int j = 0; j < brick.size(); j++ ){
+			brick[j]->Draw();
+		}
+	}
+	if( temp == type[3] ){
+		for( int j = 0; j < bomb.size(); j++ ){
+			bomb[j]->Draw();
+		}
+	}
+	if( temp == type[4] ){
+		for( int j = 0; j < fire.size(); j++ ){
+			fire[j]->Draw();
+		}
+	}
+	if( temp == type[5] ){
+		for( int j = 0; j < moob.size(); j++ ){
+			moob[j]->Draw();
 		}
 	}
 }
-bool PROCESS::PlayerMoveTo( int y, int x ){
-	string type = Passage( y = player->getPos().first + y, x = player->getPos().second + x );
-	if( type == "" ){
-		player->setPos( y, x );
-		return true;
+bool PROCESS::MovePlayer( string route ){
+	for( int i = 0; i < player.size(); i++ ){
+		int x = 0, y = 0;
+		if( route == "LEFT" ) x = -1; 
+		if( route == "RIGHT" ) x = 1;
+		if( route == "UP" ) y = -1;
+		if( route == "DOWN" ) y = 1;
+	
+		if( Passage( y += player[i]->GetPos().first, x += player[i]->GetPos().second ) ){
+			player[i]->SetPos( y, x );
+			return true;
+		}
+		return false;
 	}
-	return false;
 }
 bool PROCESS::PushBomb(){
-	if( FindBomb( player->getPos().first, player->getPos().second ) == -1 ){
-		bomb.push_back( new BOMB( player->getPos().first, player->getPos().second ) );
-		object[ player->getPos().first * area_w + player->getPos().second ] = bomb.back();
-		bomb.back()->Draw();
+	int y = player[0]->GetPos().first, x = player[0]->GetPos().second;
+	if( ObjectIdentification( y, x ) != "BOMB" ){
+		bomb.push_back( new BOMB( y, x, player[0]->GetPower() ) );
 		return true;
 	}
 	return false;
 }
-void PROCESS::BangBomb( int temp ){
-	int y = bomb[ temp ]->getPos().first;
-	int x = bomb[ temp ]->getPos().second;
 
-	bomb.erase( bomb.begin() + temp );
-	delete object[ y * area_w + x ];
-	object[ y * area_w + x ] = 0;
-		
-	if( FindFire( y, x ) == -1 ) fire.push_back( new FIRE( y, x ) );
-	for( int i=1, n1=1, n2=1, n3=1, n4=1; i < strength+1; i++ ){
-		if( n1 ) n1=BigBang( y - i,  x );
-		if( n2 ) n2=BigBang( y + i,  x );
-		if( n3 ) n3=BigBang( y,  x - i );
-		if( n4 ) n4=BigBang( y,  x + i );
+void PROCESS::BombTime(){
+	for( int i = 0; i < bomb.size(); i++ ){
+		if( bomb[i]->GetTimer() == 0 )
+			BangBomb( i );
+		else bomb[i]->SetTimer();
 	}
-	for( int i = 0; i < fire.size(); i++ )
-		fire[i]->Draw();
+}
+void PROCESS::BangBomb( int temp ){	
+	int y = bomb[ temp ]->GetPos().first;
+	int x = bomb[ temp ]->GetPos().second;
+		
+	if( Find( y, x, "FIRE" ) == -1 ) fire.push_back( new FIRE( y, x ) );
+	if( Find( y, x, "PLAYER" ) != -1 ) player.erase( player.begin() + Find( y, x, "PLAYER" ) );
+	
+	for( int i=1, n1=1, n2=1, n3=1, n4=1; i < bomb[ temp ]->GetPower() + 1; i++ ){
+		if( n1 ) n1 = BigBang( y - i,  x );
+		if( n2 ) n2 = BigBang( y + i,  x );
+		if( n3 ) n3 = BigBang( y,  x - i );
+		if( n4 ) n4 = BigBang( y,  x + i );
+	}
+	bomb.erase( bomb.begin() + temp );
 }
 bool PROCESS::BigBang( int y, int x ){
-	if( FindFire( y, x ) == -1 ){
-		if( Passage( y, x ) == "-" || Passage( y, x ) == "class BLOCK" )
-			return false;
-		if( Passage( y, x ) == "" ){
-			fire.push_back( new FIRE( y, x ) );
-			return true;
-		}
-		if( Passage( y, x ) == "class BRICK" ){
-			fire.push_back( new FIRE( y, x ) );
-			return false;
-		}
-		if( Passage( y, x ) == "class BOMB" ){
-			BangBomb( FindBomb( y, x ) );	
-			fire.push_back( new FIRE( y, x ) );
-			return false;
-		}
-		if( Passage( y, x ) == "class MONSTER_1" || Passage( y, x ) == "class MONSTER_2" || Passage( y, x ) == "class MONSTER_3" ){
-			moob.erase( moob.begin() + FindMonster( y, x ) );
-			fire.push_back( new FIRE( y, x ) );
-			return true;
-		}
-	}
-	return true;
-}
-bool PROCESS::Destroy( int y, int x ){
-	if( Passage( y, x ) == "class BOMB" ){
-		BangBomb( FindBomb( y, x ) );
+	string temp = ObjectIdentification( y , x );
+	if( temp == "-" || temp == "BLOCK" )
+		return false;
+	if( temp == "" ){
+		fire.push_back( new FIRE( y, x ));
 		return true;
 	}
-	//if( Passage( y, x ) == "class MONSTER_1" ||  Passage( y, x ) == "class MONSTER_2" ||  Passage( y, x ) == "class MONSTER_3" ){
-	//	moob.erase( moob.begin() + FindMonster( y, x ) );
-	//}
-	if( Passage( y, x ) != "" && Passage( y, x ) != "PLAYER" ){
-		delete object[ y * area_w + x ];
-		object[ y * area_w + x ] = 0;
+	if( temp == "MOOB" ){
+		moob.erase( moob.begin() + Find( y, x, "MOOB" ) );
+		fire.push_back( new FIRE( y, x ) );	
+		return true;
 	}
-	fire.erase( fire.begin() + FindFire( y, x ) );
+	if( temp == "BOMB" ){
+		BangBomb( Find( y, x, "BOMB" ) );
+		return false;
+	}
+	if( temp == "BRICK" ){
+		fire.push_back( new FIRE( y, x ) );	
+		return false;
+	}
+	if( temp == "PLAYER" ){
+		player.erase( player.begin() + Find( y, x, "PLAYER" ) );
+		fire.push_back( new FIRE( y, x ) );
+		return true;
+	}
+}
+void PROCESS::DestroyFire(){
+	for( int i = 0; i < fire.size(); ){
+		if( fire[i]->GetTimer() == 0 ){
+			if( Find( fire[i]->GetPos().first, fire[i]->GetPos().second, "BRICK" ) != -1 )
+				brick.erase( brick.begin() + Find( fire[i]->GetPos().first, fire[i]->GetPos().second, "BRICK" ) );
+			if( Find( fire[i]->GetPos().first, fire[i]->GetPos().second, "MOOB" ) != -1 )
+				moob.erase( moob.begin() + Find( fire[i]->GetPos().first, fire[i]->GetPos().second, "MOOB" ) );
+			if( Find( fire[i]->GetPos().first, fire[i]->GetPos().second, "PLAYER" ) != -1 )
+				player.erase( player.begin() + Find( fire[i]->GetPos().first, fire[i]->GetPos().second, "PLAYER" ) );
+			fire.erase( fire.begin() + i );
+		}
+		else {
+			fire[i]->SetTimer();
+			i++;
+		}
+	}
+}
+void PROCESS::MoveMoobs(){
+	for( int i = 0; i < moob.size(); i++ ){
+		if( moob[i]->GetSpeed() == 0 ){
+			bool way[4];
+			int course = -1, count_way = 0, course_inverse = -1;
+
+			if( moob[i]->course%2 ) course_inverse = moob[i]->course - 1;
+			else course_inverse = moob[i]->course + 1;
+
+			for( int k = 0; k < 4; k++ )
+				way[k] = false;
+			if( Passage( moob[i]->GetPos().first - 1, moob[i]->GetPos().second ) ){ way[0] = true; count_way++; }
+			if( Passage( moob[i]->GetPos().first + 1, moob[i]->GetPos().second ) ){ way[1] = true; count_way++; }
+			if( Passage( moob[i]->GetPos().first, moob[i]->GetPos().second - 1 ) ){ way[2] = true; count_way++; }
+			if( Passage( moob[i]->GetPos().first, moob[i]->GetPos().second + 1 ) ){ way[3] = true; count_way++; }
+
+			if( !count_way ) continue;
+			if( way[moob[i]->course] && rand()%3 ) course = moob[i]->course;
+			if( count_way == 1 ) 
+				for( int k = 0; k < 4; k++ )
+					if( way[k] == true ) course = k;
+			while( course == -1 ){
+				int s = rand()%4;
+				if( way[s] && ( s != course_inverse || rand()%2 ) ) course = s;
+			}
+
+			int x=0, y=0, v = -1;
+			if( course%2 ) v = 1;
+			if( course < 2 ) y += v;
+			else x += v;
+	
+			y += moob[i]->GetPos().first;
+			x += moob[i]->GetPos().second;
+
+			if( ObjectIdentification( y, x ) == "PLAYER" )
+				player.erase( player.begin() + Find( y, x, "PLAYER" ) );
+
+			moob[i]->SetPos( y, x );
+			moob[i]->ResetSpeed();
+			moob[i]->course = course;
+		}
+		else moob[i]->SetSpeed();
+	}
+}
+string PROCESS::ObjectIdentification( int y, int x ){
+	if( y > area_h - 1 || y < 0 || x > area_w - 1 || x < 0 )
+		return "-";
+	for_each(ii){
+		if( Find( y, x, type[i] ) != -1 )
+			return type[i];
+	}
+	return "";
+}
+bool PROCESS::Passage( int y, int x ){
+	if( y > area_h - 1 || y < 0 || x > area_w - 1 || x < 0 )
+		return false;
+	if( Find( y, x, "BOMB") != -1 || Find( y, x, "MOOB" ) != -1 || Find( y, x, "BRICK" ) != -1 || Find( y, x, "BLOCK") != -1 )
+		return false;
+
 	return true;
 }
-int PROCESS::FindFire( int y, int x ){
-	for( int i = 0; i < fire.size(); i++ )
-		if( fire[ i ]->getPos().first == y && fire[ i ]->getPos().second == x )
-			return i;
-	return -1;
-}
-int PROCESS::FindBomb( int y, int x ){
-	for( int i = 0; i < bomb.size(); i++ )
-		if( bomb[ i ]->getPos().first == y && bomb[ i ]->getPos().second == x )
-			return i;
-	return -1;
-}
-int PROCESS::FindMonster( int y, int x ){
-	for( int i = 0; i < moob.size(); i++ )
-		if( moob[i]->getPos().first == y && moob[i]->getPos().second == x )
-			return i;
-	return 0;
-}
-bool PROCESS::MoobMoveTo( int i ){
-	bool way[4];
-	int course = -1, count_way = 0, course_inverse = -1;
-
-	if( moob[i]->course%2 ) course_inverse = moob[i]->course - 1;
-	else course_inverse = moob[i]->course + 1;
-
-	for( int k = 0; k < 4; k++ )
-		way[k] = false;
-	if( Passage( moob[i]->getPos().first - 1, moob[i]->getPos().second ) == "" ){ way[0] = true; count_way++; }
-	if( Passage( moob[i]->getPos().first + 1, moob[i]->getPos().second ) == "" ){ way[1] = true; count_way++; }
-	if( Passage( moob[i]->getPos().first, moob[i]->getPos().second - 1 ) == "" ){ way[2] = true; count_way++; }
-	if( Passage( moob[i]->getPos().first, moob[i]->getPos().second + 1 ) == "" ){ way[3] = true; count_way++; }
-
-	if( !count_way ) return false;
-	if( way[moob[i]->course] && rand()%3 ) course = moob[i]->course;
-	if( count_way == 1 ) 
-		for( int k = 0; k < 4; k++ )
-			if( way[k] == true ) course = k;
-	while( course == -1 ){
-		int s = rand()%4;
-		if( way[s] && s != course_inverse ) course = s;
+int PROCESS::Find( int y, int x, string temp ){
+	if( temp == type[0] ){
+		for( int i = 0; i < player.size(); i++ )
+			if( player[ i ]->GetPos().first == y && player[ i ]->GetPos().second == x )
+				return i;
 	}
-
-	int x=0, y=0, v = -1;
-	if( course%2 ) v = 1;
-	if( course < 2 ) y += v;
-	else x += v;
-	
-	y += moob[i]->getPos().first;
-	x += moob[i]->getPos().second;
-	
-	object[y * area_w + x] = object[moob[i]->getPos().first * area_w + moob[i]->getPos().second];
-	object[moob[i]->getPos().first * area_w + moob[i]->getPos().second] = 0;
-	object[y * area_w + x]->setPos( y, x );
-	moob[i]->ResetSpeed();
-	moob[i]->course = course;
-	
-return true;
+	if( temp == type[1] ){
+		for( int i = 0; i < block.size(); i++ )
+			if( block[ i ]->GetPos().first == y && block[ i ]->GetPos().second == x )
+				return i;
+	}
+	if( temp == type[2] ){
+		for( int i = 0; i < brick.size(); i++ )
+			if( brick[ i ]->GetPos().first == y && brick[ i ]->GetPos().second == x )
+				return i;
+	}
+	if( temp == type[3] ){
+		for( int i = 0; i < bomb.size(); i++ )
+			if( bomb[ i ]->GetPos().first == y && bomb[ i ]->GetPos().second == x )
+				return i;
+	}
+	if( temp == type[4] ){
+		for( int i = 0; i < fire.size(); i++ )
+			if( fire[ i ]->GetPos().first == y && fire[ i ]->GetPos().second == x )
+				return i;
+	}
+	if( temp == type[5] ){
+		for( int i = 0; i < moob.size(); i++ )
+			if( moob[ i ]->GetPos().first == y && moob[ i ]->GetPos().second == x )
+				return i;
+	}
+	return -1;
 }
-string PROCESS::Passage( int y, int x ){ 
-	if( x < 0 || x >= area_w || y < 0 || y >= area_h )
-		return "end";
-	/*if( player->getPos().first == y && player->getPos().second == x )
-		return "PLAYER";*/
-	if( object[ y * area_w + x ] == 0 )
-		return "";
-	return typeid( *object[ y * area_w + x ] ).name();
+bool PROCESS::EndGame(){
+	if( !moob.size() )
+		return true;
+	if( !player.size() )
+		return true;
+	return false;
 }

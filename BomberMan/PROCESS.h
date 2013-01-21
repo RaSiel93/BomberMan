@@ -1,41 +1,39 @@
 #ifndef PROCES_H
 #define PROCES_H
 
-#define col_mobs 5
-#define strength 2
-
-#include <string>
-#include <vector>
-using namespace std;
-
-#define ob_size 40
-#define area_h 15
-#define area_w 31
-
-//#include "Index.cpp"
+#include "SERVICE.h"
 #include "OBJECT.h"
 
 class PROCESS{
 public:
 	PROCESS();
 	~PROCESS();
-	bool GetObject( string type, int pattern, string able  );
+	void GetObject( string temp, int y, int x );
+	void GetObject( string temp, int pattern );
+	void GetObject( string temp, int pattern, string able, int border_y = area_h, int border_x = area_w );
 	void Print();
-	bool PlayerMoveTo( int y, int x );
+	bool MovePlayer( string route );
+	void BombTime();
 	bool PushBomb();
+	void DestroyFire();
+	void MoveMoobs();
+
+	bool EndGame();
+private:
 	void BangBomb( int temp );
+	void Draw( string type );
 	bool BigBang( int y, int x );
 	bool Destroy( int y, int x );
-	int FindFire( int y, int x );
-	int FindBomb( int y, int x );
-	int FindMonster( int y, int x );
-	bool MoobMoveTo( int i );
-	string Passage( int y, int x );
+	string ObjectIdentification( int y, int x );
+	bool Passage( int y, int x );
+	int Find( int y, int x, string type );
 
-	OBJECT *object[ area_h * area_w ];
-	PLAYER *player;
+	vector< string > type;
+	vector< PLAYER* > player;
+	vector< BLOCK* > block;
+	vector< BRICK* > brick;
 	vector< BOMB* > bomb;
 	vector< FIRE* > fire;
-	vector< MONSTER* > moob;
+	vector< MOOB* > moob;
 };
 #endif //PROCES_H
