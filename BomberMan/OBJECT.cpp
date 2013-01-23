@@ -31,25 +31,73 @@ BRICK::BRICK( int y, int x ){
 	SetPos( y, x );
 }
 void BRICK::Draw(){
-	glColor3f(0.0, 1.0, 0.0);
-	glBegin(GL_LINES);	
+	//glColor3f(0.0, 1.0, 0.0);
+	//glBegin(GL_LINES);	
+	//	glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+	//	glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+	//	glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+	//	glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size , area_h*ob_size/2 - position.first*ob_size);
+	//glEnd();
+	glColor3f(0.4, 0.4, 0.4);
+	glBegin(GL_QUADS);	
 		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
 		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size , area_h*ob_size/2 - position.first*ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
 	glEnd();
 }
 
 //PLAYER
-PLAYER::PLAYER( int y, int x ){
+PLAYER::PLAYER( int y, int x, int p, int ab, bool pb, bool fr, bool cb, bool tw ){
 	SetPos( y, x );
-	SetPower( 3 );
+	SetBonus( p, "PwB" );
+	SetBonus( ab, "AB" );
+	SetBonus( pb, "PhB" );
+	SetBonus( fr, "FR" );
+	SetBonus( cb, "CB" );
+	SetBonus( tw, "TW" );
 }
-void PLAYER::SetPower( int volume ){
-	power = volume;
+int PLAYER::GetBonus( string temp ){
+	if( temp == "AB" ){
+		return amount_bomb;
+	}
+	if( temp == "PwB" ){
+		return power_bomb;
+	}
+	if( temp == "PhB" ){
+		return push_bomb;
+	}
+	if( temp == "FR" ){
+		return fire_resist;
+	}
+	if( temp == "CB" ){
+		return control_bomb;
+	}
+	if( temp == "TW" ){
+		return through_wall;
+	}
 }
-int PLAYER::GetPower(){
-	return power;
+void PLAYER::SetBonus( int volume, string temp ){
+	if( temp == "AB" ){
+		amount_bomb = volume;
+	}
+	if( temp == "PwB" ){
+		power_bomb = volume;
+	}
+}
+void PLAYER::SetBonus( bool volume, string temp ){
+	if( temp == "PhB" ){
+		push_bomb = volume;
+	}
+	if( temp == "FR" ){
+		fire_resist = volume;
+	}
+	if( temp == "CB" ){
+		control_bomb = volume;
+	}
+	if( temp == "TW" ){
+		through_wall = volume;
+	}
 }
 void PLAYER::Draw(){
 	glColor3f(1.0, 1.0, 1.0);
@@ -66,6 +114,8 @@ BOMB::BOMB( int x, int y, int p ){
 	timer = 50;
 	SetPos( x, y );
 	SetPower( p );
+	push = false;
+	course = 0;
 }
 int BOMB::GetTimer(){
 	return timer;
@@ -74,7 +124,7 @@ void BOMB::SetTimer(){
 	timer--;
 }
 void BOMB::Draw(){	
-	glColor3f(0.0, 0.0, 1.0);
+	glColor3f(0.0, 0.0, 0.0);
 	glBegin(GL_QUADS);	
 		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
 		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
@@ -152,6 +202,56 @@ MOOB_3::MOOB_3( int y, int x ){
 }
 void MOOB_3::Draw(){
 	glColor3f(1.0, 1.0, 0.0);
+	glBegin(GL_QUADS);	
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glEnd();
+}
+
+//BONUS
+BONUS_AB::BONUS_AB( int y, int x ){
+	SetPos( y, x );
+}
+void BONUS_AB::Draw(){
+	glColor3f(0.5, 0.5, 1.0);
+	glBegin(GL_QUADS);	
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glEnd();
+}
+BONUS_PwB::BONUS_PwB( int y, int x ){
+	SetPos( y, x );
+}
+void BONUS_PwB::Draw(){
+	glColor3f(1.0, 0.4, 0.4);
+	glBegin(GL_QUADS);	
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glEnd();
+}
+BONUS_PhB::BONUS_PhB( int y, int x ){
+	SetPos( y, x );
+}
+void BONUS_PhB::Draw(){
+	glColor3f(0.0, 0.5, 1.0);
+	glBegin(GL_QUADS);	
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glEnd();
+}
+BONUS_FR::BONUS_FR( int y, int x ){
+	SetPos( y, x );
+}
+void BONUS_FR::Draw(){
+	glColor3f(1.0, 0.7, 0.0);
 	glBegin(GL_QUADS);	
 		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
 		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
