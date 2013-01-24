@@ -31,7 +31,7 @@ public:
 
 class PLAYER: public OBJECT{
 public:
-						PLAYER( int y, int x, int p = 1, int ab = 1, bool pb = false, bool fr = false, bool cb = false, bool tw = false );
+						PLAYER( int y, int x, int p = 1, int ab = 1, bool pb = false, bool fr = false, bool tw = false );
 	void				Draw();
 	int					GetBonus( string temp );
 	void				SetBonus( int volume, string temp );
@@ -41,7 +41,7 @@ public:
 	int					amount_bomb;
 	bool				push_bomb;
 	bool				fire_resist;
-	bool				control_bomb;
+	//bool				control_bomb;
 	bool				through_wall;
 };
 
@@ -51,6 +51,7 @@ public:
 						BOMB( int x, int y, int p = 1 );
 	int					GetTimer();
 	void				SetTimer();
+	void				SetTimer( int volume );
 	void				Draw();
 	int					GetPower();
 	void				SetPower( int volume );
@@ -69,11 +70,13 @@ public:
 
 class MOOB: public OBJECT{
 public:
+						MOOB( bool temp = false ) : tw( temp ){}
 	virtual void		Draw() = 0;
 	int					GetSpeed();
 	void				SetSpeed();
 	void				ResetSpeed();	
 	int					course;
+	bool				tw;
 protected:
 	int					speed;
 	int					speed_const;
@@ -116,6 +119,11 @@ public:
 class BONUS_FR: public BONUS{
 public:
 						BONUS_FR( int y, int x );
+	void				Draw();
+};
+class BONUS_TW: public BONUS{
+public:
+						BONUS_TW( int y, int x );
 	void				Draw();
 };
 #endif // OBJECT_H

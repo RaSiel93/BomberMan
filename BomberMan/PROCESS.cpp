@@ -2,11 +2,11 @@
 
 PROCESS::PROCESS(){
 	type.push_back("PLAYER");
-	type.push_back("BLOCK");
-	type.push_back("BRICK");
+	type.push_back("BLOCK");	
+	type.push_back("FIRE");	
 	type.push_back("BOMB");
-	type.push_back("FIRE");
 	type.push_back("MOOB");
+	type.push_back("BRICK");
 	type.push_back("BONUS");
 }
 void PROCESS::GetObject( string temp, int y, int x ){
@@ -17,13 +17,10 @@ void PROCESS::GetObject( string temp, int y, int x ){
 		block.push_back( new BLOCK( y, x ) );
 	}
 	if( temp == type[2] ){
-		brick.push_back( new BRICK( y, x ) );
+		fire.push_back( new FIRE( y, x ) );
 	}
 	if( temp == type[3] ){
 		bomb.push_back( new BOMB( y, x ) );
-	}
-	if( temp == type[4] ){
-		fire.push_back( new FIRE( y, x ) );
 	}
 	if( temp == "MOOB_1" ){
 		moob.push_back( new MOOB_1( y, x ) );
@@ -33,6 +30,9 @@ void PROCESS::GetObject( string temp, int y, int x ){
 	}
 	if( temp == "MOOB_3" ){
 		moob.push_back( new MOOB_3( y, x ) );
+	}
+	if( temp == type[5] ){
+		brick.push_back( new BRICK( y, x ) );
 	}
 	if( temp == "BONUS_AB" ){
 		bonus.push_back( new BONUS_AB( y, x ) );
@@ -45,6 +45,9 @@ void PROCESS::GetObject( string temp, int y, int x ){
 	}
 	if( temp == "BONUS_FR" ){
 		bonus.push_back( new BONUS_FR( y, x ) );
+	}
+	if( temp == "BONUS_TW" ){
+		bonus.push_back( new BONUS_TW( y, x ) );
 	}
 }
 void PROCESS::GetObject( string temp, int amount, string able, int border_y, int border_x ){
@@ -61,7 +64,7 @@ void PROCESS::GetObject( string temp, int amount, string able, int border_y, int
 			}
 			return;
 		}
-		if( temp == "BONUS_AB" || temp == "BONUS_PwB" || temp == "BONUS_PhB" || temp == "BONUS_FR" ){
+		if( temp == "BONUS_AB" || temp == "BONUS_PwB" || temp == "BONUS_PhB" || temp == "BONUS_FR" || temp == "BONUS_TW" ){
 			if( brick.size() - bonus.size() > amount ){
 				for( int j = 0; j < amount; ){
 					int y = rand()%area_h, x = rand()%area_w;
@@ -84,7 +87,7 @@ void PROCESS::GetObject( string temp, int construction ){
 	}
 }
 void PROCESS::Print(){
-	for_each( i ){
+	for( int i = 6; i >= 0; i-- ){
 		Draw( type[i] );
 	}
 }
@@ -100,8 +103,8 @@ void PROCESS::Draw( string temp ){
 		}
 	}
 	if( temp == type[2] ){
-		for( int j = 0; j < brick.size(); j++ ){
-			brick[j]->Draw();
+		for( int j = 0; j < fire.size(); j++ ){
+			fire[j]->Draw();
 		}
 	}
 	if( temp == type[3] ){
@@ -110,13 +113,13 @@ void PROCESS::Draw( string temp ){
 		}
 	}
 	if( temp == type[4] ){
-		for( int j = 0; j < fire.size(); j++ ){
-			fire[j]->Draw();
+		for( int j = 0; j < moob.size(); j++ ){
+			moob[j]->Draw();
 		}
 	}
 	if( temp == type[5] ){
-		for( int j = 0; j < moob.size(); j++ ){
-			moob[j]->Draw();
+		for( int j = 0; j < brick.size(); j++ ){
+			brick[j]->Draw();
 		}
 	}
 	if( temp == type[6] ){
@@ -127,41 +130,36 @@ void PROCESS::Draw( string temp ){
 }
 bool PROCESS::MovePlayer( string route ){
 	for( int i = 0; i < player.size(); i++ ){
-		int x = 0, y = 0;
+		int y = 0, x = 0;
 		if( route == "LEFT" ) x = -1; 
 		if( route == "RIGHT" ) x = 1;
 		if( route == "UP" ) y = -1;
 		if( route == "DOWN" ) y = 1;
-	
-		if( Passage( y += player[i]->GetPos().first, x += player[i]->GetPos().second ) || Find( y, x, "BOMB") != -1 ){
-			int a = Find( y, x, "BONUS" );
+
+		y += player[i]->GetPos().first;
+		x += player[i]->GetPos().second;
+		
+		int a = Find( y, x, "BOMB" );
+		int b = Find( y, x, "BRICK" );
+		int c = Find( y, x, "BONUS" );
+
+		if( Passage( y, x ) || ( a != -1 && player[i]->push_bomb ) || ( b != -1 && player[i]->through_wall || Passage( y, x ) ) ){	
 			if( a != -1 ){
-				string type = typeid(*bonus[a]).name();
-				GetBonus( type, player[i] );
-				bonus.erase( bonus.begin() + a );
-			}
-			int b = Find( y, x, "BOMB" );
-			if( b != -1 && player[i]->push_bomb ){
-				MoveBomb( i, b );
+				MoveBomb( i, a );
 				return false;
 			}
-			if( Find( y, x, "BOMB") == -1 ) {
-				player[i]->SetPos( y, x );
-				return true;
+			if( b == -1 && c != -1 ){
+				string type = typeid(*bonus[c]).name();
+				type.erase( type.begin(), type.begin() + 12 );
+				player[i]->SetBonus( 1, type );
+				player[i]->SetBonus( true, type );
+				bonus.erase( bonus.begin() + c );
 			}
+			player[i]->SetPos( y, x );
+			return true;
 		}
 		return false;
 	}
-}
-void PROCESS::GetBonus( string type, PLAYER *pl ){
-	if( type == "class BONUS_AB" )
-		pl->amount_bomb++;
-	if( type == "class BONUS_PwB" )
-		pl->power_bomb++;
-	if( type == "class BONUS_PhB" )
-		pl->push_bomb = true;
-	if( type == "class BONUS_FR" )
-		pl->fire_resist = true;
 }
 void PROCESS::MoveBomb( int numb_p, int numb_b ){
 	bomb[numb_b]->push = true;
@@ -177,11 +175,11 @@ void PROCESS::MoveBomb( int numb_p, int numb_b ){
 		}
 	}
 }
-bool PROCESS::PushBomb(){
-	int y = player[0]->GetPos().first, x = player[0]->GetPos().second;
-	if( ObjectIdentification( y, x ) != "BOMB" && player[0]->GetBonus( "AB" ) ){
+bool PROCESS::PushBomb( int i ){
+	int y = player[i]->GetPos().first, x = player[i]->GetPos().second;
+	if( Find( y, x, "BOMB" ) == -1 && player[i]->GetBonus( "AB" ) && Find( y, x, "BRICK" ) == -1  ){
 		bomb.push_back( new BOMB( y, x, player[0]->GetBonus( "PwB" ) ) );
-		player[0]->SetBonus( player[0]->GetBonus( "AB" ) - 1, "AB" );
+		player[i]->SetBonus( -1, "AB" );
 		return true;
 	}
 	return false;
@@ -206,58 +204,57 @@ void PROCESS::BombTime(){
 	}
 }
 void PROCESS::BangBomb( int temp ){	
-	player[0]->SetBonus( player[0]->GetBonus( "AB" ) + 1, "AB" );
+	int i;
+	player[0]->SetBonus( 1, "AB" );
 	int y = bomb[ temp ]->GetPos().first;
 	int x = bomb[ temp ]->GetPos().second;
 		
-	if( Find( y, x, "FIRE" ) == -1 ) fire.push_back( new FIRE( y, x ) );
-	if( Find( y, x, "PLAYER" ) != -1 && player[0]->fire_resist == false ) player.erase( player.begin() + Find( y, x, "PLAYER" ) );
+	fire.push_back( new FIRE( y, x ) );
+	if( ( i = Find( y, x, "PLAYER" )) != -1 && player[i]->fire_resist == false ) player.erase( player.begin() + i );
 	int pow_bomb = bomb[ temp ]->GetPower();
-	bomb.erase( bomb.begin() + temp );
-	for( int i=1, n1=1, n2=1, n3=1, n4=1; i < pow_bomb + 1; i++ ){
-		if( n1 ) n1 = BigBang( y - i,  x );
-		if( n2 ) n2 = BigBang( y + i,  x );
-		if( n3 ) n3 = BigBang( y,  x - i );
-		if( n4 ) n4 = BigBang( y,  x + i );
+	for( int k=1, n1=1, n2=1, n3=1, n4=1; k < pow_bomb + 1; k++ ){
+		if( n1 ) n1 = BigBang( y - k,  x );
+		if( n2 ) n2 = BigBang( y + k,  x );
+		if( n3 ) n3 = BigBang( y,  x - k );
+		if( n4 ) n4 = BigBang( y,  x + k );
 	}
+	bomb[ temp ]->SetTimer( -1 );
 }
 bool PROCESS::BigBang( int y, int x ){
 	string temp = ObjectIdentification( y , x );
+	int l;
 	if( temp == "-" || temp == "BLOCK" )
 		return false;
-	if( temp == "" ){
-		fire.push_back( new FIRE( y, x ));
-		return true;
-	}
-	if( temp == "MOOB" ){
-		moob.erase( moob.begin() + Find( y, x, "MOOB" ) );
-		fire.push_back( new FIRE( y, x ) );	
-		return true;
-	}
-	if( temp == "BOMB" ){
-		BangBomb( Find( y, x, "BOMB" ) );
+	if( ( l = Find( y, x, "BOMB" ) ) != -1 && Find( y, x, "FIRE" ) == -1 ){
+		BangBomb( l );
 		return false;
 	}
-	if( temp == "BRICK" ){
-		brick.erase( brick.begin() + Find( y, x, "BRICK" ) );
-		fire.push_back( new FIRE( y, x ) );	
-		return false;
+	while( ( l = Find( y, x, "MOOB" ) ) != -1 ){
+		moob.erase( moob.begin() + l );
 	}
-	if( temp == "PLAYER" ){
-		if( player[0]->fire_resist == false ) player.erase( player.begin() + Find( y, x, "PLAYER" ) );
-		fire.push_back( new FIRE( y, x ) );
-		return true;
+	if( ( l = Find( y, x, "PLAYER" ) ) != -1 ){
+		if( player[l]->fire_resist == false ){ 
+			player.erase( player.begin() + l );
+		}
 	}
+	fire.push_back( new FIRE( y, x ) );
+	if( Find( y, x, "BRICK" ) != -1 || Find( y, x, "BOMB" ) != -1 ) return false;
+	return true;
 }
 void PROCESS::DestroyFire(){
 	for( int i = 0; i < fire.size(); ){
 		if( fire[i]->GetTimer() == 0 ){
-			if( Find( fire[i]->GetPos().first, fire[i]->GetPos().second, "BRICK" ) != -1 )
-				brick.erase( brick.begin() + Find( fire[i]->GetPos().first, fire[i]->GetPos().second, "BRICK" ) );
-			if( Find( fire[i]->GetPos().first, fire[i]->GetPos().second, "MOOB" ) != -1 )
-				moob.erase( moob.begin() + Find( fire[i]->GetPos().first, fire[i]->GetPos().second, "MOOB" ) );
-			if( Find( fire[i]->GetPos().first, fire[i]->GetPos().second, "PLAYER" ) != -1 && player[0]->fire_resist == false )
-				player.erase( player.begin() + Find( fire[i]->GetPos().first, fire[i]->GetPos().second, "PLAYER" ) );
+			int y = fire[i]->GetPos().first, x = fire[i]->GetPos().second;
+			while( Find( y, x, "MOOB" ) != -1 )
+				moob.erase( moob.begin() + Find( y, x, "MOOB" ) );
+			if( Find( y, x, "PLAYER" ) != -1 && player[0]->fire_resist == false )
+				player.erase( player.begin() + Find( y, x, "PLAYER" ) );
+			if( Find( y, x, "BOMB" ) != -1 )
+				bomb.erase( bomb.begin() + Find( y, x, "BOMB" ) );
+			if( Find( y, x, "BONUS" ) != -1 && Find( y, x, "BRICK" ) == -1 )
+				bonus.erase( bonus.begin() + Find( y, x, "BONUS" ) );
+			if( Find( y, x, "BRICK" ) != -1 )
+				brick.erase( brick.begin() + Find( y, x, "BRICK" ) );
 			fire.erase( fire.begin() + i );
 		}
 		else {
@@ -275,13 +272,16 @@ void PROCESS::MoveMoobs(){
 			if( moob[i]->course%2 ) course_inverse = moob[i]->course - 1;
 			else course_inverse = moob[i]->course + 1;
 
-			for( int k = 0; k < 4; k++ )
-				way[k] = false;
-			if( Passage( moob[i]->GetPos().first - 1, moob[i]->GetPos().second ) ){ way[0] = true; count_way++; }
-			if( Passage( moob[i]->GetPos().first + 1, moob[i]->GetPos().second ) ){ way[1] = true; count_way++; }
-			if( Passage( moob[i]->GetPos().first, moob[i]->GetPos().second - 1 ) ){ way[2] = true; count_way++; }
-			if( Passage( moob[i]->GetPos().first, moob[i]->GetPos().second + 1 ) ){ way[3] = true; count_way++; }
+			{
+				int y = moob[i]->GetPos().first, x = moob[i]->GetPos().second;
 
+				for( int k = 0; k < 4; k++ )
+					way[k] = false;
+				if( Passage( y - 1, x ) || ( Find( y - 1, x, "BRICK" ) != -1 && moob[i]->tw ) ){ way[0] = true; count_way++; }
+				if( Passage( y + 1, x ) || ( Find( y + 1, x, "BRICK" ) != -1 && moob[i]->tw ) ){ way[1] = true; count_way++; }
+				if( Passage( y, x - 1 ) || ( Find( y, x - 1, "BRICK" ) != -1 && moob[i]->tw ) ){ way[2] = true; count_way++; }
+				if( Passage( y, x + 1 ) || ( Find( y, x + 1, "BRICK" ) != -1 && moob[i]->tw ) ){ way[3] = true; count_way++; }
+			}
 			if( !count_way ) continue;
 			if( way[moob[i]->course] && rand()%3 ) course = moob[i]->course;
 			if( count_way == 1 ) 
@@ -313,7 +313,6 @@ void PROCESS::MoveMoobs(){
 string PROCESS::ObjectIdentification( int y, int x ){
 	if( y > area_h - 1 || y < 0 || x > area_w - 1 || x < 0 )
 		return "-";
-	//for_each(i){
 	for( int i = 0; i < 7; i++ ){
 		if( Find( y, x, type[i] ) != -1 ){
 			return type[i];
@@ -341,8 +340,8 @@ int PROCESS::Find( int y, int x, string temp ){
 				return i;
 	}
 	if( temp == type[2] ){
-		for( int i = 0; i < brick.size(); i++ )
-			if( brick[ i ]->GetPos().first == y && brick[ i ]->GetPos().second == x )
+		for( int i = 0; i < fire.size(); i++ )
+			if( fire[ i ]->GetPos().first == y && fire[ i ]->GetPos().second == x )
 				return i;
 	}
 	if( temp == type[3] ){
@@ -351,13 +350,13 @@ int PROCESS::Find( int y, int x, string temp ){
 				return i;
 	}
 	if( temp == type[4] ){
-		for( int i = 0; i < fire.size(); i++ )
-			if( fire[ i ]->GetPos().first == y && fire[ i ]->GetPos().second == x )
+		for( int i = 0; i < moob.size(); i++ )
+			if( moob[ i ]->GetPos().first == y && moob[ i ]->GetPos().second == x )
 				return i;
 	}
 	if( temp == type[5] ){
-		for( int i = 0; i < moob.size(); i++ )
-			if( moob[ i ]->GetPos().first == y && moob[ i ]->GetPos().second == x )
+		for( int i = 0; i < brick.size(); i++ )
+			if( brick[ i ]->GetPos().first == y && brick[ i ]->GetPos().second == x )
 				return i;
 	}
 	if( temp == type[6] ){
@@ -368,8 +367,11 @@ int PROCESS::Find( int y, int x, string temp ){
 	return -1;
 }
 bool PROCESS::EndGame(){
-	if( !moob.size() || !player.size() ){
+	if( !player.size() ){// || !moob.size() ||  ){
 		return true;
 	}
 	return false;
+}
+void PROCESS::Restart(){
+	player.push_back( new PLAYER( 0, 0 ) );
 }

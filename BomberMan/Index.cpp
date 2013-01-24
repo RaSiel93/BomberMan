@@ -11,8 +11,8 @@ void Draw(){
 	game->MoveMoobs();
 	game->DestroyFire();
 	glutSwapBuffers();
-	//if( game->EndGame() ) 
-	//	exit(0);
+	if( game->EndGame() ) 
+		game->Restart();
  }
 
 void Timer(int value){
@@ -22,7 +22,7 @@ void Timer(int value){
 
 void Keyboard(unsigned char  key, int x, int y){
 	switch(key){
-	case 32: game->PushBomb();
+	case 32: game->PushBomb( 0 );
 		break;
 	}
 }
@@ -52,12 +52,13 @@ int main(int argc, char** argv){
 	game->GetObject( "BRICK", area_h*area_w/3, "RANDOM", 1, 1 );
 	game->GetObject( "BONUS_AB", 7, "RANDOM", 0, 0 );
 	game->GetObject( "BONUS_PwB", 7, "RANDOM", 0, 0 );
-	game->GetObject( "BONUS_PhB", 3, "RANDOM", 0, 0 );
-	game->GetObject( "BONUS_FR", 3, "RANDOM", 0, 0 );
-	game->GetObject( "MOOB_1", 20, "RANDOM", 5, 5 );
-	game->GetObject( "MOOB_2", 20, "RANDOM", 5, 5 );
-	game->GetObject( "MOOB_3", 20, "RANDOM", 5, 5 );
-
+	game->GetObject( "BONUS_PhB", 1, "RANDOM", 0, 0 );
+	game->GetObject( "BONUS_FR", 1, "RANDOM", 0, 0 );
+	game->GetObject( "BONUS_TW", 1, "RANDOM", 0, 0 );
+	game->GetObject( "MOOB_1", area_h*area_w/30, "RANDOM", 5, 5 );
+	game->GetObject( "MOOB_2", area_h*area_w/60, "RANDOM", 5, 5 );
+	game->GetObject( "MOOB_3", area_h*area_w/90, "RANDOM", 5, 5 );
+	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB); 
 	glutInitWindowSize( ob_size * area_w, ob_size * area_h );//ob_size*area_w, ob_size*area_h );

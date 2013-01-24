@@ -13,14 +13,15 @@ public:
 	void				GetObject( string temp, int pattern, string able, int border_y = area_h, int border_x = area_w );
 	void				Print();
 	bool				MovePlayer( string route );
-	void				GetBonus( string type, PLAYER *pl );
+	//void				GetBonus( string type, PLAYER *pl );
 	void				MoveBomb( int numb_p, int numb_b );
 	void				BombTime();
-	bool				PushBomb();
+	bool				PushBomb( int i );
 	void				DestroyFire();
 	void				MoveMoobs();
 
 	bool				EndGame();
+	void				Restart();
 private:
 	void				BangBomb( int temp );
 	void				Draw( string type );

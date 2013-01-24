@@ -48,13 +48,15 @@ void BRICK::Draw(){
 }
 
 //PLAYER
-PLAYER::PLAYER( int y, int x, int p, int ab, bool pb, bool fr, bool cb, bool tw ){
+PLAYER::PLAYER( int y, int x, int p, int ab, bool pb, bool fr, bool tw ){
 	SetPos( y, x );
-	SetBonus( p, "PwB" );
-	SetBonus( ab, "AB" );
+	power_bomb = p;
+	amount_bomb = ab;
+	//SetBonus( p, "PwB" );
+	//SetBonus( ab, "AB" );
 	SetBonus( pb, "PhB" );
 	SetBonus( fr, "FR" );
-	SetBonus( cb, "CB" );
+	//SetBonus( cb, "CB" );
 	SetBonus( tw, "TW" );
 }
 int PLAYER::GetBonus( string temp ){
@@ -70,19 +72,19 @@ int PLAYER::GetBonus( string temp ){
 	if( temp == "FR" ){
 		return fire_resist;
 	}
-	if( temp == "CB" ){
-		return control_bomb;
-	}
+	//if( temp == "CB" ){
+	//	return control_bomb;
+	//}
 	if( temp == "TW" ){
 		return through_wall;
 	}
 }
 void PLAYER::SetBonus( int volume, string temp ){
 	if( temp == "AB" ){
-		amount_bomb = volume;
+		amount_bomb += volume;
 	}
 	if( temp == "PwB" ){
-		power_bomb = volume;
+		power_bomb += volume;
 	}
 }
 void PLAYER::SetBonus( bool volume, string temp ){
@@ -92,9 +94,9 @@ void PLAYER::SetBonus( bool volume, string temp ){
 	if( temp == "FR" ){
 		fire_resist = volume;
 	}
-	if( temp == "CB" ){
-		control_bomb = volume;
-	}
+	//if( temp == "CB" ){
+	//	control_bomb = volume;
+	//}
 	if( temp == "TW" ){
 		through_wall = volume;
 	}
@@ -123,6 +125,9 @@ int BOMB::GetTimer(){
 void BOMB::SetTimer(){
 	timer--;
 }
+void BOMB::SetTimer( int volume ){
+	timer = volume;
+}
 void BOMB::Draw(){	
 	glColor3f(0.0, 0.0, 0.0);
 	glBegin(GL_QUADS);	
@@ -142,7 +147,7 @@ int BOMB::GetPower(){
 //FIRE
 FIRE::FIRE( int x, int y ){
 	SetPos( x, y );
-	timer = 10;
+	timer = 8;
 }
 void FIRE::Draw(){		
 	glColor3f(1.0, 1.0, 0.0);
@@ -181,7 +186,8 @@ void MOOB_1::Draw(){
 }
 MOOB_2::MOOB_2( int y, int x ){
 	SetPos( y, x );
-	speed_const = 15;
+	tw = true;
+	speed_const = 20;
 	course = rand()%4;
 	speed = speed_const;
 }
@@ -252,6 +258,18 @@ BONUS_FR::BONUS_FR( int y, int x ){
 }
 void BONUS_FR::Draw(){
 	glColor3f(1.0, 0.7, 0.0);
+	glBegin(GL_QUADS);	
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glEnd();
+}
+BONUS_TW::BONUS_TW( int y, int x ){
+	SetPos( y, x );
+}
+void BONUS_TW::Draw(){
+	glColor3f(0.3, 0.7, 0.0);
 	glBegin(GL_QUADS);	
 		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
 		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
