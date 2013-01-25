@@ -31,13 +31,6 @@ BRICK::BRICK( int y, int x ){
 	SetPos( y, x );
 }
 void BRICK::Draw(){
-	//glColor3f(0.0, 1.0, 0.0);
-	//glBegin(GL_LINES);	
-	//	glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-	//	glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-	//	glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-	//	glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size , area_h*ob_size/2 - position.first*ob_size);
-	//glEnd();
 	glColor3f(0.4, 0.4, 0.4);
 	glBegin(GL_QUADS);	
 		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
@@ -52,8 +45,6 @@ PLAYER::PLAYER( int y, int x, int p, int ab, bool pb, bool fr, bool tw ){
 	SetPos( y, x );
 	power_bomb = p;
 	amount_bomb = ab;
-	//SetBonus( p, "PwB" );
-	//SetBonus( ab, "AB" );
 	SetBonus( pb, "PhB" );
 	SetBonus( fr, "FR" );
 	//SetBonus( cb, "CB" );
@@ -147,7 +138,7 @@ int BOMB::GetPower(){
 //FIRE
 FIRE::FIRE( int x, int y ){
 	SetPos( x, y );
-	timer = 8;
+	timer = 4;
 }
 void FIRE::Draw(){		
 	glColor3f(1.0, 1.0, 0.0);
@@ -202,12 +193,81 @@ void MOOB_2::Draw(){
 }
 MOOB_3::MOOB_3( int y, int x ){
 	SetPos( y, x );
-	speed_const = 10;
+	speed_const = 20;
 	course = rand()%4;
 	speed = speed_const;
+	brain = true;
 }
 void MOOB_3::Draw(){
 	glColor3f(1.0, 1.0, 0.0);
+	glBegin(GL_QUADS);	
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glEnd();
+}
+MOOB_4::MOOB_4( int y, int x ){
+	SetPos( y, x );
+	course = rand()%4;
+	speed_const = 15;
+	speed = speed_const;
+	brain = true;
+}
+void MOOB_4::Draw(){
+	glColor3f(0.8, 0.4, 0.8);
+	glBegin(GL_QUADS);	
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glEnd();
+}
+MOOB_5::MOOB_5( int y, int x ){
+	SetPos( y, x );
+	course = rand()%4;
+	speed_const = 15;
+	speed = speed_const;
+	tw = true;
+	brain = true;
+}
+void MOOB_5::Draw(){
+	glColor3f(0.7, 0.6, 0.9);
+	glBegin(GL_QUADS);	
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glEnd();
+}
+MOOB_6::MOOB_6( int y, int x ){
+	SetPos( y, x );
+	course = rand()%4;
+	speed_const = 15;
+	speed = speed_const;
+	brain = true;
+	smart_brain = true;
+}
+void MOOB_6::Draw(){
+	glColor3f(0.0, 1.0, 0.5);
+	glBegin(GL_QUADS);	
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glEnd();
+}
+MOOB_7::MOOB_7( int y, int x ){
+	SetPos( y, x );
+	course = rand()%4;
+	speed_const = 15;
+	speed = speed_const;
+	tw = true;
+	brain = true;
+	smart_brain = true;
+}
+void MOOB_7::Draw(){
+	glColor3f(1.0, 1.0, 1.0);
 	glBegin(GL_QUADS);	
 		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
 		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);

@@ -36,4 +36,39 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="BAG.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="BANG1.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="BANG2.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="BANG3.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="BEEP.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="DEAD.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="PUSH.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="WALL1.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="WALL2.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="WALL3.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="WALL4.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

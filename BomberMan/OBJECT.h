@@ -70,13 +70,15 @@ public:
 
 class MOOB: public OBJECT{
 public:
-						MOOB( bool temp = false ) : tw( temp ){}
+						MOOB( bool temp = false, bool temp2 = false, bool temp3 = false ) : tw( temp ), brain( temp2 ), smart_brain( temp3 ){}
 	virtual void		Draw() = 0;
 	int					GetSpeed();
 	void				SetSpeed();
 	void				ResetSpeed();	
 	int					course;
 	bool				tw;
+	bool				brain;
+	bool				smart_brain;
 protected:
 	int					speed;
 	int					speed_const;
@@ -94,6 +96,26 @@ public:
 class MOOB_3: public MOOB{
 public:
 						MOOB_3( int y, int x );
+	void				Draw();
+};
+class MOOB_4: public MOOB{
+public:
+						MOOB_4( int y, int x );
+	void				Draw();
+};
+class MOOB_5: public MOOB{
+public:
+						MOOB_5( int y, int x );
+	void				Draw();
+};
+class MOOB_6: public MOOB{
+public:
+						MOOB_6( int y, int x );
+	void				Draw();
+};
+class MOOB_7: public MOOB{
+public:
+						MOOB_7( int y, int x );
 	void				Draw();
 };
 

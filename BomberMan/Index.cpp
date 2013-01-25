@@ -2,17 +2,36 @@
 #include "SERVICE.h"
 #include "PROCESS.h"
 
-PROCESS *game = new PROCESS;
+static jmp_buf env;
+PROCESS *game;
+PLAYER *play;
+bool flag_start = false;
+int level = 1;
 
 void Draw(){
 	glClear(GL_COLOR_BUFFER_BIT);
+	if( !flag_start ) {
+		game = new PROCESS;
+		flag_start = game->LevelGenerate( level );
+	}
 	game->Print();
 	game->BombTime();
 	game->MoveMoobs();
 	game->DestroyFire();
-	glutSwapBuffers();
-	if( game->EndGame() ) 
+	glutSwapBuffers();	
+	if( game->GameOver() ) {
 		game->Restart();
+	}
+	if( game->WinLevel() ) {
+		glClearColor(0.1, 0.4, 0.1, 1.0);
+		glutPostRedisplay();
+		glLoadIdentity();
+		glClear(GL_COLOR_BUFFER_BIT);
+		Sleep(1000);
+		flag_start = false;
+		level++;
+		delete game;
+	}
  }
 
 void Timer(int value){
@@ -44,34 +63,24 @@ void Initialize(){
 
 int main(int argc, char** argv){
 	srand( time(0) );
-
-	start:
-
-	game->GetObject( "PLAYER", 0, 0 );
-	game->GetObject( "BLOCK", 2 );
-	game->GetObject( "BRICK", area_h*area_w/3, "RANDOM", 1, 1 );
-	game->GetObject( "BONUS_AB", 7, "RANDOM", 0, 0 );
-	game->GetObject( "BONUS_PwB", 7, "RANDOM", 0, 0 );
-	game->GetObject( "BONUS_PhB", 1, "RANDOM", 0, 0 );
-	game->GetObject( "BONUS_FR", 1, "RANDOM", 0, 0 );
-	game->GetObject( "BONUS_TW", 1, "RANDOM", 0, 0 );
-	game->GetObject( "MOOB_1", area_h*area_w/30, "RANDOM", 5, 5 );
-	game->GetObject( "MOOB_2", area_h*area_w/60, "RANDOM", 5, 5 );
-	game->GetObject( "MOOB_3", area_h*area_w/90, "RANDOM", 5, 5 );
-	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB); 
-	glutInitWindowSize( ob_size * area_w, ob_size * area_h );//ob_size*area_w, ob_size*area_h );
+	glutInitWindowSize( ob_size * area_w, ob_size * area_h );
 	glutInitWindowPosition( 50.0, 50.0 );
 	glutCreateWindow("Bomberman with OpenGl");
-	
-	glutDisplayFunc(Draw);
-	
-	glutTimerFunc(500, Timer, 0);
-	glutKeyboardFunc(Keyboard);
-	glutSpecialFunc(SKeyboard);
-	Initialize();
-	glutMainLoop();
 
+	while( 1 ){
+		setjmp(env);
+		
+		glutDisplayFunc(Draw);	
+		glutTimerFunc(500, Timer, 0);
+		glutKeyboardFunc(Keyboard);
+		glutSpecialFunc(SKeyboard);
+		Initialize();
+		
+		glutMainLoop();
+		
+		game->~PROCESS();
+	}
 	return 0;
 }

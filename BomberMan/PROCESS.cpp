@@ -1,4 +1,5 @@
 #include "PROCESS.h"
+#include <cmath>
 
 PROCESS::PROCESS(){
 	type.push_back("PLAYER");
@@ -8,6 +9,33 @@ PROCESS::PROCESS(){
 	type.push_back("MOOB");
 	type.push_back("BRICK");
 	type.push_back("BONUS");
+}
+PROCESS::~PROCESS(){
+	player.clear();
+	block.clear();
+	fire.clear();
+	bomb.clear();
+	moob.clear();
+	brick.clear();
+	bonus.clear();
+}
+bool PROCESS::LevelGenerate( int level ){
+	GetObject( "PLAYER", 0, 0 );
+	GetObject( "BLOCK", (level - 1 )%10 + 1 );
+	GetObject( "BRICK", area_h*area_w/4 + level * 5, "RANDOM", 1, 1 );
+	GetObject( "BONUS_AB", 7, "RANDOM", 0, 0 );
+	GetObject( "BONUS_PwB", 7, "RANDOM", 0, 0 );
+	if( level > 1 ) GetObject( "BONUS_PhB", 1, "RANDOM", 0, 0 );
+	if( level > 3 ) GetObject( "BONUS_FR", 1, "RANDOM", 0, 0 );
+	if( level > 5 ) GetObject( "BONUS_TW", 1, "RANDOM", 0, 0 );
+	GetObject( "MOOB_1", area_h*area_w/50  - level + 1, "RANDOM", 5, 5 );
+	if ( level > 1 ) GetObject( "MOOB_2", area_h*area_w/50 - level + 2, "RANDOM", 5, 5 );
+	if ( level > 2 ) GetObject( "MOOB_3", area_h*area_w/50 - level + 3, "RANDOM", 5, 5 );
+	if ( level > 3 ) GetObject( "MOOB_4", area_h*area_w/50 - level + 4, "RANDOM", 5, 5 );
+	if ( level > 4 ) GetObject( "MOOB_5", area_h*area_w/50 - level + 5, "RANDOM", 5, 5 );
+	if ( level > 5 ) GetObject( "MOOB_6", area_h*area_w/50 - level + 6, "RANDOM", 5, 5 );
+	if ( level > 6 ) GetObject( "MOOB_7", area_h*area_w/50 - level + 7, "RANDOM", 5, 5 );
+	return true;
 }
 void PROCESS::GetObject( string temp, int y, int x ){
 	if( temp == type[0] ){
@@ -31,6 +59,18 @@ void PROCESS::GetObject( string temp, int y, int x ){
 	if( temp == "MOOB_3" ){
 		moob.push_back( new MOOB_3( y, x ) );
 	}
+	if( temp == "MOOB_4" ){
+		moob.push_back( new MOOB_4( y, x ) );
+	}
+	if( temp == "MOOB_5" ){
+		moob.push_back( new MOOB_5( y, x ) );
+	}
+	if( temp == "MOOB_6" ){
+		moob.push_back( new MOOB_6( y, x ) );
+	}
+	if( temp == "MOOB_7" ){
+		moob.push_back( new MOOB_7( y, x ) );
+	}
 	if( temp == type[5] ){
 		brick.push_back( new BRICK( y, x ) );
 	}
@@ -52,7 +92,7 @@ void PROCESS::GetObject( string temp, int y, int x ){
 }
 void PROCESS::GetObject( string temp, int amount, string able, int border_y, int border_x ){
 	for_each( i ){
-		if( temp == type[i] || temp == "MOOB_1" || temp == "MOOB_2" || temp == "MOOB_3" ){
+		if( temp == type[i] || temp == "MOOB_1" || temp == "MOOB_2" || temp == "MOOB_3" || temp == "MOOB_4" || temp == "MOOB_5" || temp == "MOOB_6" || temp == "MOOB_7"){
 			for( int j = 0; j < amount; ){
 				int y = rand()%area_h, x = rand()%area_w;
 				if( border_y < y || border_x < x ){
@@ -81,9 +121,60 @@ void PROCESS::GetObject( string temp, int amount, string able, int border_y, int
 	}
 }
 void PROCESS::GetObject( string temp, int construction ){
-	for( int y = 1; y < area_h; y += 2 ){
-		for( int x = 1; x < area_w; x += 2 )
-			GetObject( temp, y, x );
+	if( construction == 1 ){
+		for( int y = 1; y < area_h; y += 2 ){
+			for( int x = 1; x < area_w; x += 2 )
+				GetObject( temp, y, x );
+		}
+	}
+	if( construction == 2 ){
+		for( int y = 1; y < area_h - 1; y++ ){
+			for( int x = 1; x < area_w - 1; x += 3 ){
+				if( ( y + 1 ) % 3 == 0 ) x++;
+				GetObject( temp, y, x );
+				if( ( y + 1 ) % 3 == 0 ) x--;
+			}
+			if( ( y + 1 ) % 3 == 0 ) y++;
+		}
+	}
+	if( construction == 3 ){
+		for( int y = 1; y < area_h - 1; y++ ){
+			for( int x = 1; x < area_w - 1; x += 4 ){
+				GetObject( temp, y, x );
+			}
+			if(  (y + 1 ) % 6 == 0 ) y++;
+		}
+	}
+	if( construction == 4 ){
+		for( int y = 1; y < area_h - 1; y++ ){
+			for( int x = (y - 1)%4 + 1; x < area_w - 1; x += 4 ){
+				GetObject( temp, y, x );
+			}
+		}
+	}
+	if( construction == 5 ){
+		for( int y = 1; y < area_h - 1; y+=3 ){
+			for( int x = 1; x < area_w - 1; x+=2 ){
+				GetObject( temp, y, x );
+			}
+		}
+	}
+	if( construction == 6 ){
+		for( int y = 1; y < area_h - 1; y++ ){
+			for( int x = 1; x < area_w - 1; x++ ){
+				if( ( x + y + 1 ) % 7 ) x++;
+				else y++;
+				GetObject( temp, y, x );
+			}
+		}
+	}
+	if( construction == 7 ){
+		for( int y = 1; y < area_h - 1; y += 5 ){
+			for( int x = 1; x < area_w - 1; x++ ){
+				if( ( x * y ) % 2 ) x += 3;
+				GetObject( temp, y, x );
+			}
+		}
 	}
 }
 void PROCESS::Print(){
@@ -149,6 +240,11 @@ bool PROCESS::MovePlayer( string route ){
 				return false;
 			}
 			if( b == -1 && c != -1 ){
+				BYTE szBuf[256];
+				mciSendString((LPSTR)"close snd", (LPSTR)szBuf, 256, NULL);
+				mciSendString((LPSTR)"open bag.wav type waveaudio alias snd wait", (LPSTR)szBuf, 256, NULL);
+				mciSendString((LPSTR)"play snd", (LPSTR)szBuf, 256, NULL);
+
 				string type = typeid(*bonus[c]).name();
 				type.erase( type.begin(), type.begin() + 12 );
 				player[i]->SetBonus( 1, type );
@@ -157,11 +253,26 @@ bool PROCESS::MovePlayer( string route ){
 			}
 			player[i]->SetPos( y, x );
 			return true;
+		} else {
+			BYTE szBuf[256];
+			mciSendString((LPSTR)"close snd", (LPSTR)szBuf, 256, NULL);
+			int sound = rand()%4;
+			switch( sound ){
+			case 0: mciSendString((LPSTR)"open wall1.wav type waveaudio alias snd wait", (LPSTR)szBuf, 256, NULL); break;
+			case 1: mciSendString((LPSTR)"open wall2.wav type waveaudio alias snd wait", (LPSTR)szBuf, 256, NULL); break;
+			case 2: mciSendString((LPSTR)"open wall3.wav type waveaudio alias snd wait", (LPSTR)szBuf, 256, NULL); break;
+			case 3: mciSendString((LPSTR)"open wall4.wav type waveaudio alias snd wait", (LPSTR)szBuf, 256, NULL); break;
+			}
+			mciSendString((LPSTR)"play snd", (LPSTR)szBuf, 256, NULL);
 		}
 		return false;
 	}
 }
 void PROCESS::MoveBomb( int numb_p, int numb_b ){
+	BYTE szBuf[256];
+	mciSendString((LPSTR)"close snd", (LPSTR)szBuf, 256, NULL);
+	mciSendString((LPSTR)"open push.wav type waveaudio alias snd wait", (LPSTR)szBuf, 256, NULL);
+	mciSendString((LPSTR)"play snd", (LPSTR)szBuf, 256, NULL);
 	bomb[numb_b]->push = true;
 	if( bomb[numb_b]->GetPos().first == player[numb_p]->GetPos().first ){
 		bomb[numb_b]->course = 1; 
@@ -178,6 +289,11 @@ void PROCESS::MoveBomb( int numb_p, int numb_b ){
 bool PROCESS::PushBomb( int i ){
 	int y = player[i]->GetPos().first, x = player[i]->GetPos().second;
 	if( Find( y, x, "BOMB" ) == -1 && player[i]->GetBonus( "AB" ) && Find( y, x, "BRICK" ) == -1  ){
+		BYTE szBuf[256];
+		mciSendString((LPSTR)"close snd", (LPSTR)szBuf, 256, NULL);
+		mciSendString((LPSTR)"open beep.wav type waveaudio alias snd wait", (LPSTR)szBuf, 256, NULL);
+		mciSendString((LPSTR)"play snd", (LPSTR)szBuf, 256, NULL);
+		
 		bomb.push_back( new BOMB( y, x, player[0]->GetBonus( "PwB" ) ) );
 		player[i]->SetBonus( -1, "AB" );
 		return true;
@@ -204,11 +320,18 @@ void PROCESS::BombTime(){
 	}
 }
 void PROCESS::BangBomb( int temp ){	
+	int sound = rand()%3;
+	switch( sound ){
+		case 0: PlaySound("BANG1.wav", NULL, SND_ASYNC); break;
+		case 1: PlaySound("BANG2.wav", NULL, SND_ASYNC); break;
+		case 2: PlaySound("BANG3.wav", NULL, SND_ASYNC); break;
+	}
 	int i;
 	player[0]->SetBonus( 1, "AB" );
 	int y = bomb[ temp ]->GetPos().first;
 	int x = bomb[ temp ]->GetPos().second;
-		
+	
+
 	fire.push_back( new FIRE( y, x ) );
 	if( ( i = Find( y, x, "PLAYER" )) != -1 && player[i]->fire_resist == false ) player.erase( player.begin() + i );
 	int pow_bomb = bomb[ temp ]->GetPower();
@@ -229,28 +352,39 @@ bool PROCESS::BigBang( int y, int x ){
 		BangBomb( l );
 		return false;
 	}
-	while( ( l = Find( y, x, "MOOB" ) ) != -1 ){
-		moob.erase( moob.begin() + l );
-	}
-	if( ( l = Find( y, x, "PLAYER" ) ) != -1 ){
-		if( player[l]->fire_resist == false ){ 
-			player.erase( player.begin() + l );
-		}
-	}
+	//while( ( l = Find( y, x, "MOOB" ) ) != -1 ){
+	//	moob.erase( moob.begin() + l );
+	//}
+	//if( ( l = Find( y, x, "PLAYER" ) ) != -1 ){
+	//	if( player[l]->fire_resist == false ){ 
+	//		player.erase( player.begin() + l );
+	//	}
+	//}
 	fire.push_back( new FIRE( y, x ) );
-	if( Find( y, x, "BRICK" ) != -1 || Find( y, x, "BOMB" ) != -1 ) return false;
+	if( Find( y, x, "BRICK" ) != -1 || Find( y, x, "BOMB" ) != -1 ) 
+		return false;
 	return true;
 }
 void PROCESS::DestroyFire(){
+	int size_moob = moob.size();
 	for( int i = 0; i < fire.size(); ){
 		if( fire[i]->GetTimer() == 0 ){
 			int y = fire[i]->GetPos().first, x = fire[i]->GetPos().second;
-			while( Find( y, x, "MOOB" ) != -1 )
+			if( Find( y, x, "MOOB" ) != -1 ){
+				if( moob.size() == 1 ){ 
+					PlaySound("win.wav", NULL, SND_ASYNC);
+					Sleep( 3000 );
+				}
 				moob.erase( moob.begin() + Find( y, x, "MOOB" ) );
+			}
 			if( Find( y, x, "PLAYER" ) != -1 && player[0]->fire_resist == false )
 				player.erase( player.begin() + Find( y, x, "PLAYER" ) );
-			if( Find( y, x, "BOMB" ) != -1 )
+			if( Find( y, x, "BOMB" ) != -1 ){
+				if( bomb[Find( y, x, "BOMB" )]->GetTimer() > 0 ){
+					BangBomb( Find( y, x, "BOMB" ) );
+				}
 				bomb.erase( bomb.begin() + Find( y, x, "BOMB" ) );
+			}
 			if( Find( y, x, "BONUS" ) != -1 && Find( y, x, "BRICK" ) == -1 )
 				bonus.erase( bonus.begin() + Find( y, x, "BONUS" ) );
 			if( Find( y, x, "BRICK" ) != -1 )
@@ -261,6 +395,12 @@ void PROCESS::DestroyFire(){
 			fire[i]->SetTimer();
 			i++;
 		}
+	}
+	if( size_moob - moob.size() ){
+		BYTE szBuf[256];
+		mciSendString((LPSTR)"close snd", (LPSTR)szBuf, 256, NULL);
+		mciSendString((LPSTR)"open moobd1.wav type waveaudio alias snd wait", (LPSTR)szBuf, 256, NULL);
+		mciSendString((LPSTR)"play snd", (LPSTR)szBuf, 256, NULL);
 	}
 }
 void PROCESS::MoveMoobs(){
@@ -283,14 +423,50 @@ void PROCESS::MoveMoobs(){
 				if( Passage( y, x + 1 ) || ( Find( y, x + 1, "BRICK" ) != -1 && moob[i]->tw ) ){ way[3] = true; count_way++; }
 			}
 			if( !count_way ) continue;
-			if( way[moob[i]->course] && rand()%3 ) course = moob[i]->course;
+			
+			bool flag = way[course_inverse];
+			if( moob[i]->smart_brain && course == -1 ){
+				way[course_inverse] = false;
+				for( int j = 0; j < player.size(); j++ ){
+					int yy = 0, xx = 2; 
+					bool yx = true;
+					if( player[j]->GetPos().first > moob[i]->GetPos().first ) yy = 1;
+					if( player[j]->GetPos().second > moob[i]->GetPos().second ) xx = 3;
+					if( player[j]->GetPos().first == moob[i]->GetPos().first || player[j]->GetPos().second == moob[i]->GetPos().second ) yx = false;
+					if( yx ){
+						if( abs( player[j]->GetPos().first - moob[i]->GetPos().first ) < abs( player[j]->GetPos().second - moob[i]->GetPos().second ) ){
+							if( way[yy] ) course = yy;
+							else if( way[xx] ) course = xx;
+						}
+						if( abs( player[j]->GetPos().first - moob[i]->GetPos().first ) > abs( player[j]->GetPos().second - moob[i]->GetPos().second ) ){
+							if( way[xx] ) course = xx;
+							else if( way[yy] ) course = yy;
+						}
+					}
+				}
+			}
+			if( moob[i]->brain && course == -1 ){
+				for( int j = 0; j < player.size(); j++ ){
+					if( player[j]->GetPos().first == moob[i]->GetPos().first ){
+						if( player[j]->GetPos().second < moob[i]->GetPos().second ){ if( way[2] ) course = 2; 
+						} else { if( way[3] ) course = 3; }
+					}
+					if( player[j]->GetPos().second == moob[i]->GetPos().second ){
+						if( player[j]->GetPos().first < moob[i]->GetPos().first ){ if( way[0] ) course = 0;
+						} else { if( way[1] ) course = 1; }
+					}
+				}
+			}
+			way[ course_inverse	] = flag;
 			if( count_way == 1 ) 
 				for( int k = 0; k < 4; k++ )
 					if( way[k] == true ) course = k;
+			if( course == -1 && way[moob[i]->course] && rand()%3 ) course = moob[i]->course;
 			while( course == -1 ){
 				int s = rand()%4;
-				if( way[s] && ( s != course_inverse || rand()%3 ) ) course = s;
+				if( way[s] && ( s != course_inverse || rand()%4 ) ) course = s;
 			}
+
 
 			int x=0, y=0, v = -1;
 			if( course%2 ) v = 1;
@@ -366,8 +542,15 @@ int PROCESS::Find( int y, int x, string temp ){
 	}
 	return -1;
 }
-bool PROCESS::EndGame(){
-	if( !player.size() ){// || !moob.size() ||  ){
+bool PROCESS::WinLevel(){
+	if( !moob.size() ){
+		return true;
+	}
+	return false;
+}
+bool PROCESS::GameOver(){
+	if( !player.size() ){
+		PlaySound("dead.wav", NULL, SND_ASYNC);
 		return true;
 	}
 	return false;

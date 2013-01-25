@@ -8,6 +8,7 @@ class PROCESS{
 public:
 						PROCESS();
 						~PROCESS();
+	bool				LevelGenerate( int level );
 	void				GetObject( string temp, int y, int x );
 	void				GetObject( string temp, int pattern );
 	void				GetObject( string temp, int pattern, string able, int border_y = area_h, int border_x = area_w );
@@ -20,7 +21,8 @@ public:
 	void				DestroyFire();
 	void				MoveMoobs();
 
-	bool				EndGame();
+	bool				WinLevel();
+	bool				GameOver();
 	void				Restart();
 private:
 	void				BangBomb( int temp );
