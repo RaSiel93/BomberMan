@@ -41,15 +41,31 @@ void BRICK::Draw(){
 }
 
 //PLAYER
-PLAYER::PLAYER( int y, int x, int p, int ab, bool pb, bool fr, bool tw ){
+PLAYER::PLAYER( int y, int x, int sc, int p, int ab, bool pb, bool fr, bool tw ){
+	score = sc;
 	SetPos( y, x );
 	power_bomb = p;
 	amount_bomb = ab;
 	SetBonus( pb, "PhB" );
 	SetBonus( fr, "FR" );
-	//SetBonus( cb, "CB" );
 	SetBonus( tw, "TW" );
 }
+PLAYER &PLAYER::operator=( PLAYER &player ){
+	score = player.score;
+	SetPos( player.GetPos().first, player.GetPos().second );
+	power_bomb = player.power_bomb;
+	amount_bomb = amount_bomb;
+	SetBonus( player.push_bomb, "PhB" );
+	SetBonus( player.fire_resist, "FR" );
+	SetBonus( player.through_wall, "TW" );
+	return *this;
+}
+PLAYER *PLAYER::operator*(){
+	return this;
+}
+
+
+
 int PLAYER::GetBonus( string temp ){
 	if( temp == "AB" ){
 		return amount_bomb;
@@ -138,7 +154,7 @@ int BOMB::GetPower(){
 //FIRE
 FIRE::FIRE( int x, int y ){
 	SetPos( x, y );
-	timer = 4;
+	timer = 6;
 }
 void FIRE::Draw(){		
 	glColor3f(1.0, 1.0, 0.0);

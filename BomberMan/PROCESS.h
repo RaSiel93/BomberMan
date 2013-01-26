@@ -21,9 +21,12 @@ public:
 	void				DestroyFire();
 	void				MoveMoobs();
 
-	bool				WinLevel();
-	bool				GameOver();
-	void				Restart();
+	void				GameStart();
+	void				GameProcess();
+	void				GameOver();
+	void				ResetPlayer( int i = 0 );
+	void				Clear();
+	bool				IfEmpty();
 private:
 	void				BangBomb( int temp );
 	void				Draw( string type );
@@ -33,6 +36,7 @@ private:
 	bool				Passage( int y, int x );
 	int					Find( int y, int x, string type );
 
+	int level;
 	vector< string >	type;
 	vector< PLAYER* >	player;
 	vector< BLOCK* >	block;

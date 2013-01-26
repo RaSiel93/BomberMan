@@ -37,37 +37,40 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="BAG.wav">
+    <None Include="sound\BAG.wav">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="BANG1.wav">
+    <None Include="sound\BANG1.wav">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="BANG2.wav">
+    <None Include="sound\BANG2.wav">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="BANG3.wav">
+    <None Include="sound\BANG3.wav">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="BEEP.wav">
+    <None Include="sound\BEEP.wav">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="DEAD.wav">
+    <None Include="sound\DEAD.wav">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="PUSH.wav">
+    <None Include="sound\PUSH.wav">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="WALL1.wav">
+    <None Include="sound\WALL1.wav">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="WALL2.wav">
+    <None Include="sound\WALL2.wav">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="WALL3.wav">
+    <None Include="sound\WALL3.wav">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="WALL4.wav">
+    <None Include="sound\WALL4.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="sound\WIN.wav">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

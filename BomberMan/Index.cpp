@@ -1,38 +1,18 @@
 #include <time.h>
 #include "SERVICE.h"
 #include "PROCESS.h"
+#include <setjmp.h>
 
 static jmp_buf env;
 PROCESS *game;
 PLAYER *play;
-bool flag_start = false;
-int level = 1;
 
 void Draw(){
 	glClear(GL_COLOR_BUFFER_BIT);
-	if( !flag_start ) {
-		game = new PROCESS;
-		flag_start = game->LevelGenerate( level );
-	}
-	game->Print();
-	game->BombTime();
-	game->MoveMoobs();
-	game->DestroyFire();
-	glutSwapBuffers();	
-	if( game->GameOver() ) {
-		game->Restart();
-	}
-	if( game->WinLevel() ) {
-		glClearColor(0.1, 0.4, 0.1, 1.0);
-		glutPostRedisplay();
-		glLoadIdentity();
-		glClear(GL_COLOR_BUFFER_BIT);
-		Sleep(1000);
-		flag_start = false;
-		level++;
-		delete game;
-	}
- }
+	game->GameProcess();
+	glutSwapBuffers();
+	game->GameOver();
+}
 
 void Timer(int value){
 	glutPostRedisplay();
@@ -62,6 +42,9 @@ void Initialize(){
 }
 
 int main(int argc, char** argv){
+
+	game = new PROCESS;
+
 	srand( time(0) );
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB); 

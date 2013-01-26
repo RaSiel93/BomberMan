@@ -31,12 +31,15 @@ public:
 
 class PLAYER: public OBJECT{
 public:
-						PLAYER( int y, int x, int p = 1, int ab = 1, bool pb = false, bool fr = false, bool tw = false );
+						PLAYER( int y, int x, int sc = 0, int p = 1, int ab = 1, bool pb = false, bool fr = false, bool tw = false );
+	PLAYER& 			operator=( PLAYER &player );
+	PLAYER*  			operator*();
 	void				Draw();
 	int					GetBonus( string temp );
 	void				SetBonus( int volume, string temp );
 	void				SetBonus( bool volume, string temp );
 //private:
+	int					score;
 	int					power_bomb;
 	int					amount_bomb;
 	bool				push_bomb;

@@ -64,7 +64,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;OpenGL32.lib;GLu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -78,17 +78,18 @@
     <ClInclude Include="SERVICE.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="BAG.wav" />
-    <None Include="BANG1.wav" />
-    <None Include="BANG2.wav" />
-    <None Include="BANG3.wav" />
-    <None Include="BEEP.wav" />
-    <None Include="DEAD.wav" />
-    <None Include="PUSH.wav" />
-    <None Include="WALL1.wav" />
-    <None Include="WALL2.wav" />
-    <None Include="WALL3.wav" />
-    <None Include="WALL4.wav" />
+    <None Include="sound\BAG.wav" />
+    <None Include="sound\BANG1.wav" />
+    <None Include="sound\BANG2.wav" />
+    <None Include="sound\BANG3.wav" />
+    <None Include="sound\BEEP.wav" />
+    <None Include="sound\DEAD.wav" />
+    <None Include="sound\PUSH.wav" />
+    <None Include="sound\WALL1.wav" />
+    <None Include="sound\WALL2.wav" />
+    <None Include="sound\WALL3.wav" />
+    <None Include="sound\WALL4.wav" />
+    <None Include="sound\WIN.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
