@@ -17,12 +17,12 @@ BLOCK::BLOCK( int y, int x ){
 	SetPos( y, x );
 }
 void BLOCK::Draw(){
-	glColor3f(0.7, 0.7, 0.7);
-	glBegin(GL_QUADS);	
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glBindTexture(GL_TEXTURE_2D, 2);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
 	glEnd();
 }
 
@@ -31,24 +31,28 @@ BRICK::BRICK( int y, int x ){
 	SetPos( y, x );
 }
 void BRICK::Draw(){
-	glColor3f(0.4, 0.4, 0.4);
-	glBegin(GL_QUADS);	
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glBindTexture(GL_TEXTURE_2D, 3);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
 	glEnd();
 }
 
 //PLAYER
-PLAYER::PLAYER( int y, int x, int sc, int p, int ab, bool pb, bool fr, bool tw ){
+PLAYER::PLAYER( int y, int x, int lf, int sc, int ud, int p, int ab, bool pb, bool tw, bool fr ){
+	life = lf;
 	score = sc;
+	undead = ud;
 	SetPos( y, x );
 	power_bomb = p;
 	amount_bomb = ab;
 	SetBonus( pb, "PhB" );
-	SetBonus( fr, "FR" );
 	SetBonus( tw, "TW" );
+	SetBonus( fr, "FR" );
+	undead = ud;
+	//bomb_master = bm;
 }
 PLAYER &PLAYER::operator=( PLAYER &player ){
 	score = player.score;
@@ -58,14 +62,12 @@ PLAYER &PLAYER::operator=( PLAYER &player ){
 	SetBonus( player.push_bomb, "PhB" );
 	SetBonus( player.fire_resist, "FR" );
 	SetBonus( player.through_wall, "TW" );
+	undead = player.undead;
 	return *this;
 }
 PLAYER *PLAYER::operator*(){
 	return this;
 }
-
-
-
 int PLAYER::GetBonus( string temp ){
 	if( temp == "AB" ){
 		return amount_bomb;
@@ -79,12 +81,10 @@ int PLAYER::GetBonus( string temp ){
 	if( temp == "FR" ){
 		return fire_resist;
 	}
-	//if( temp == "CB" ){
-	//	return control_bomb;
-	//}
 	if( temp == "TW" ){
 		return through_wall;
 	}
+	return 0;
 }
 void PLAYER::SetBonus( int volume, string temp ){
 	if( temp == "AB" ){
@@ -92,6 +92,9 @@ void PLAYER::SetBonus( int volume, string temp ){
 	}
 	if( temp == "PwB" ){
 		power_bomb += volume;
+	}
+	if( temp == "UD" ){
+		undead += volume;
 	}
 }
 void PLAYER::SetBonus( bool volume, string temp ){
@@ -109,13 +112,31 @@ void PLAYER::SetBonus( bool volume, string temp ){
 	}
 }
 void PLAYER::Draw(){
-	glColor3f(1.0, 1.0, 1.0);
-	glBegin(GL_LINES);	
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size/2, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size/2, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
-	glEnd();
+	if( undead > 50 ){
+		glBindTexture(GL_TEXTURE_2D, 19);
+		glBegin(GL_QUADS);
+			glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+			glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+			glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+			glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glEnd();
+	} else if( undead%2 ){
+		glBindTexture(GL_TEXTURE_2D, 19);
+		glBegin(GL_QUADS);
+			glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+			glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+			glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+			glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glEnd();
+	} else { 
+		glBindTexture(GL_TEXTURE_2D, 1);
+		glBegin(GL_QUADS);
+			glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+			glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+			glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+			glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glEnd();
+	}
 }
 
 //BOMB
@@ -135,13 +156,13 @@ void BOMB::SetTimer(){
 void BOMB::SetTimer( int volume ){
 	timer = volume;
 }
-void BOMB::Draw(){	
-	glColor3f(0.0, 0.0, 0.0);
-	glBegin(GL_QUADS);	
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+void BOMB::Draw(){
+	glBindTexture(GL_TEXTURE_2D, 4);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
 	glEnd();
 }
 void BOMB::SetPower( int volume ){
@@ -156,13 +177,13 @@ FIRE::FIRE( int x, int y ){
 	SetPos( x, y );
 	timer = 6;
 }
-void FIRE::Draw(){		
-	glColor3f(1.0, 1.0, 0.0);
-	glBegin(GL_QUADS);	
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+void FIRE::Draw(){
+	glBindTexture(GL_TEXTURE_2D, 5);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
 	glEnd();
 }
 
@@ -183,12 +204,12 @@ MOOB_1::MOOB_1( int y, int x ){
 	speed = speed_const;
 }
 void MOOB_1::Draw(){
-	glColor3f(1.0, 0.0, 0.0);
-	glBegin(GL_QUADS);	
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glBindTexture(GL_TEXTURE_2D, 6);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
 	glEnd();
 }
 MOOB_2::MOOB_2( int y, int x ){
@@ -199,12 +220,12 @@ MOOB_2::MOOB_2( int y, int x ){
 	speed = speed_const;
 }
 void MOOB_2::Draw(){
-	glColor3f(0.0, 1.0, 1.0);
-	glBegin(GL_QUADS);	
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glBindTexture(GL_TEXTURE_2D, 7);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
 	glEnd();
 }
 MOOB_3::MOOB_3( int y, int x ){
@@ -215,12 +236,12 @@ MOOB_3::MOOB_3( int y, int x ){
 	brain = true;
 }
 void MOOB_3::Draw(){
-	glColor3f(1.0, 1.0, 0.0);
-	glBegin(GL_QUADS);	
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glBindTexture(GL_TEXTURE_2D, 8);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
 	glEnd();
 }
 MOOB_4::MOOB_4( int y, int x ){
@@ -231,12 +252,12 @@ MOOB_4::MOOB_4( int y, int x ){
 	brain = true;
 }
 void MOOB_4::Draw(){
-	glColor3f(0.8, 0.4, 0.8);
-	glBegin(GL_QUADS);	
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glBindTexture(GL_TEXTURE_2D, 9);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
 	glEnd();
 }
 MOOB_5::MOOB_5( int y, int x ){
@@ -248,12 +269,12 @@ MOOB_5::MOOB_5( int y, int x ){
 	brain = true;
 }
 void MOOB_5::Draw(){
-	glColor3f(0.7, 0.6, 0.9);
-	glBegin(GL_QUADS);	
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glBindTexture(GL_TEXTURE_2D, 10);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
 	glEnd();
 }
 MOOB_6::MOOB_6( int y, int x ){
@@ -265,12 +286,12 @@ MOOB_6::MOOB_6( int y, int x ){
 	smart_brain = true;
 }
 void MOOB_6::Draw(){
-	glColor3f(0.0, 1.0, 0.5);
-	glBegin(GL_QUADS);	
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glBindTexture(GL_TEXTURE_2D, 11);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
 	glEnd();
 }
 MOOB_7::MOOB_7( int y, int x ){
@@ -283,12 +304,12 @@ MOOB_7::MOOB_7( int y, int x ){
 	smart_brain = true;
 }
 void MOOB_7::Draw(){
-	glColor3f(1.0, 1.0, 1.0);
-	glBegin(GL_QUADS);	
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glBindTexture(GL_TEXTURE_2D, 12);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
 	glEnd();
 }
 
@@ -297,59 +318,72 @@ BONUS_AB::BONUS_AB( int y, int x ){
 	SetPos( y, x );
 }
 void BONUS_AB::Draw(){
-	glColor3f(0.5, 0.5, 1.0);
-	glBegin(GL_QUADS);	
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glColor3f(1.0, 1.0, 1.0);
+	glBindTexture(GL_TEXTURE_2D, 13);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
 	glEnd();
 }
 BONUS_PwB::BONUS_PwB( int y, int x ){
 	SetPos( y, x );
 }
 void BONUS_PwB::Draw(){
-	glColor3f(1.0, 0.4, 0.4);
-	glBegin(GL_QUADS);	
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glBindTexture(GL_TEXTURE_2D, 14);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
 	glEnd();
 }
 BONUS_PhB::BONUS_PhB( int y, int x ){
 	SetPos( y, x );
 }
 void BONUS_PhB::Draw(){
-	glColor3f(0.0, 0.5, 1.0);
-	glBegin(GL_QUADS);	
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
-	glEnd();
-}
-BONUS_FR::BONUS_FR( int y, int x ){
-	SetPos( y, x );
-}
-void BONUS_FR::Draw(){
-	glColor3f(1.0, 0.7, 0.0);
-	glBegin(GL_QUADS);	
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glBindTexture(GL_TEXTURE_2D, 15);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
 	glEnd();
 }
 BONUS_TW::BONUS_TW( int y, int x ){
 	SetPos( y, x );
 }
 void BONUS_TW::Draw(){
-	glColor3f(0.3, 0.7, 0.0);
-	glBegin(GL_QUADS);	
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
-		glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glBindTexture(GL_TEXTURE_2D, 16);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glEnd();
+}
+BONUS_FR::BONUS_FR( int y, int x ){
+	SetPos( y, x );
+}
+void BONUS_FR::Draw(){
+	glBindTexture(GL_TEXTURE_2D, 17);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
+	glEnd();
+}
+BONUS_UD::BONUS_UD( int y, int x ){
+	SetPos( y, x );
+}
+void BONUS_UD::Draw(){
+	glBindTexture(GL_TEXTURE_2D, 18);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size);
+		glTexCoord2f(0, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 0); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size - ob_size);
+		glTexCoord2f(1, 1); glVertex2f(-area_w*ob_size/2 + position.second*ob_size + ob_size, area_h*ob_size/2 - position.first*ob_size);
 	glEnd();
 }

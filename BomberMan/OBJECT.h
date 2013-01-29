@@ -31,21 +31,26 @@ public:
 
 class PLAYER: public OBJECT{
 public:
-						PLAYER( int y, int x, int sc = 0, int p = 1, int ab = 1, bool pb = false, bool fr = false, bool tw = false );
+						PLAYER( int y, int x, int lf = 3, int sc = 0, int ud = 10, /*int sd = 3,*/ 
+							int p = 1, int ab = 1, bool pb = false, bool tw = false, bool fr = false );
 	PLAYER& 			operator=( PLAYER &player );
 	PLAYER*  			operator*();
 	void				Draw();
 	int					GetBonus( string temp );
 	void				SetBonus( int volume, string temp );
 	void				SetBonus( bool volume, string temp );
-//private:
+//private
+	int					life;
 	int					score;
+	int					undead;
+	//int				speed;
 	int					power_bomb;
 	int					amount_bomb;
 	bool				push_bomb;
 	bool				fire_resist;
 	//bool				control_bomb;
 	bool				through_wall;
+	//int					bomb_master;
 };
 
 class BOMB: public OBJECT{
@@ -149,6 +154,11 @@ public:
 class BONUS_TW: public BONUS{
 public:
 						BONUS_TW( int y, int x );
+	void				Draw();
+};
+class BONUS_UD: public BONUS{
+public:
+						BONUS_UD( int y, int x );
 	void				Draw();
 };
 #endif // OBJECT_H

@@ -13,7 +13,7 @@ public:
 	void				GetObject( string temp, int pattern );
 	void				GetObject( string temp, int pattern, string able, int border_y = area_h, int border_x = area_w );
 	void				Print();
-	bool				MovePlayer( string route );
+	void				MovePlayer( string route );
 	//void				GetBonus( string type, PLAYER *pl );
 	void				MoveBomb( int numb_p, int numb_b );
 	void				BombTime();
@@ -21,12 +21,16 @@ public:
 	void				DestroyFire();
 	void				MoveMoobs();
 
+	void				PlayerBombMaster();
+
 	void				GameStart();
 	void				GameProcess();
-	void				GameOver();
+	void				LevelComplite();
+	bool				GameOver();
 	void				ResetPlayer( int i = 0 );
 	void				Clear();
 	bool				IfEmpty();
+
 private:
 	void				BangBomb( int temp );
 	void				Draw( string type );
@@ -38,7 +42,7 @@ private:
 
 	int level;
 	vector< string >	type;
-	vector< PLAYER* >	player;
+	public:vector< PLAYER* >	player;
 	vector< BLOCK* >	block;
 	vector< BRICK* >	brick;
 	vector< BOMB* >		bomb;
