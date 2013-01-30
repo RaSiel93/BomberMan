@@ -9,12 +9,15 @@ static jmp_buf env;
 
 unsigned int TextureIDs[NUM_TEXTURES];
 
-
 string win_title, title = "Bomberman v0.7";
 char buf1[4];
 char buf2[4];
 char buf3[4];
-time_t timer;
+
+bool pause = false;
+time_t timer; /*time_game,*/; 
+int timer_pause = 0;
+int time_game;
 
 PROCESS *game;
 
@@ -129,21 +132,32 @@ void LoadTextures(){
 }
 
 void Draw(){
-	game->GameProcess();
-
 	time_t timer_now;
 	timer_now = time(NULL);
-	int time = timer_now - timer;
+	if( pause ){
+		timer_pause = timer_now - timer - time_game;
+	}
+	if( !pause ){
+		game->GameProcess();
+		if( game->LevelComplite() ){
+			pause = true;
+			Sleep( 3000 );
+			game->Clear();
+		}
 
-	win_title = title + ": Количество жизней - " + itoa(game->player[0]->life, buf1, 10) + "; Количество очков - " + itoa(game->player[0]->score, buf2, 10) + "; Время игры - " +
-		itoa(time, buf3, 10);
-	glutSetWindowTitle( win_title.c_str() );
-	if( game->GameOver() ){
-		glClear(GL_COLOR_BUFFER_BIT);
-		Sleep( 1000 );
-		glutSwapBuffers();
-		Sleep( 2000 );	
-		longjmp(env, 0);
+		time_game = timer_now - timer - timer_pause;
+		win_title = title + ": Количество жизней - " + itoa(game->player[0]->life, buf1, 10) + "; Количество очков - " + itoa(game->player[0]->score, buf2, 10) + "; Время игры - " +
+			itoa(time_game, buf3, 10);
+		glutSetWindowTitle( win_title.c_str() );
+		
+		if( game->GameOver() ){
+			glClear(GL_COLOR_BUFFER_BIT);
+			Sleep( 1000 );
+			glutSwapBuffers();
+			Sleep( 1000 );	
+			longjmp(env, 0);
+		}
+		pause = false;
 	}
 }
 void Initialize(){
@@ -162,16 +176,34 @@ void Timer(int value){
 
 void Keyboard(unsigned char  key, int x, int y){
 	switch(key){
-	case 32: game->PushBomb( 0 );
+	
+	case 32: 
+		if( !pause ){
+			game->PushBomb( 0 );
+		}
+		break;
+	case 13:
+		if( pause ){ 
+			pause = false; 
+		}
+		break;
+	case 27: 
+		if( !pause ){ 
+			pause = true; 
+		} else { 
+			pause = false;
+		}
 		break;
 	}
 }
 void SKeyboard(int key, int x, int y){
-	switch(key){
-	case GLUT_KEY_LEFT: game->MovePlayer( "LEFT" ); break;
-	case GLUT_KEY_RIGHT: game->MovePlayer( "RIGHT" ); break;
-	case GLUT_KEY_UP: game->MovePlayer( "UP" ); break;
-	case GLUT_KEY_DOWN: game->MovePlayer( "DOWN" ); break;
+	if( !pause ){
+		switch(key){
+		case GLUT_KEY_LEFT: game->MovePlayer( "LEFT" ); break;
+		case GLUT_KEY_RIGHT: game->MovePlayer( "RIGHT" ); break;
+		case GLUT_KEY_UP: game->MovePlayer( "UP" ); break;
+		case GLUT_KEY_DOWN: game->MovePlayer( "DOWN" ); break;
+		}
 	}
 }
 

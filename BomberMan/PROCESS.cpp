@@ -1,8 +1,6 @@
 #include "PROCESS.h"
 #include <cmath>
 
-
-
 PROCESS::PROCESS(){
 	level = 0;
 	type.push_back("BLOCK");	
@@ -33,13 +31,13 @@ bool PROCESS::LevelGenerate( int level ){
 	if( level > 3 ) GetObject( "BONUS_TW", 1, "RANDOM", 0, 0 );
 	if( level > 4 ) GetObject( "BONUS_FR", 1, "RANDOM", 0, 0 );
 	if( level > 5 ) GetObject( "BONUS_UD", 1, "RANDOM", 0, 0 );
-	GetObject( "MOOB_1", area/50  - level + 1, "RANDOM", 5, 5 );
-	if ( level > 1 ) GetObject( "MOOB_2", area/60 - level + 2, "RANDOM", 5, 5 );
-	if ( level > 2 ) GetObject( "MOOB_3", area/70 - level + 3, "RANDOM", 5, 5 );
-	if ( level > 3 ) GetObject( "MOOB_4", area/70 - level + 4, "RANDOM", 5, 5 );
-	if ( level > 4 ) GetObject( "MOOB_5", area/70 - level + 5, "RANDOM", 5, 5 );
-	if ( level > 5 ) GetObject( "MOOB_6", area/70 - level + 6, "RANDOM", 5, 5 );
-	if ( level > 6 ) GetObject( "MOOB_7", area/70 - level + 7, "RANDOM", 5, 5 );
+	GetObject( "MOOB_1", area/50  - (level%9) + 1, "RANDOM", 5, 5 );
+	if ( level > 1 ) GetObject( "MOOB_2", area/60 - (level%11) + 2, "RANDOM", 5, 5 );
+	if ( level > 2 ) GetObject( "MOOB_3", area/70 - (level%13) + 3, "RANDOM", 5, 5 );
+	if ( level > 3 ) GetObject( "MOOB_4", area/70 - (level%15) + 4, "RANDOM", 5, 5 );
+	if ( level > 4 ) GetObject( "MOOB_5", area/70 - (level%17) + 5, "RANDOM", 5, 5 );
+	if ( level > 5 ) GetObject( "MOOB_6", area/70 - (level%19) + 6, "RANDOM", 5, 5 );
+	if ( level > 6 ) GetObject( "MOOB_7", area/70 - (level%21) + 7, "RANDOM", 5, 5 );
 	return true;
 }
 void PROCESS::GetObject( string temp, int y, int x ){
@@ -272,10 +270,10 @@ void PROCESS::MovePlayer( string route ){
 			mciSendString((LPSTR)"close snd", (LPSTR)szBuf, 256, NULL);
 			int sound = rand()%4;
 			switch( sound ){
-			case 0: mciSendString((LPSTR)"open sound/wall1.wav type waveaudio alias snd wait", (LPSTR)szBuf, 256, NULL); break;
-			case 1: mciSendString((LPSTR)"open sound/wall2.wav type waveaudio alias snd wait", (LPSTR)szBuf, 256, NULL); break;
-			case 2: mciSendString((LPSTR)"open sound/wall3.wav type waveaudio alias snd wait", (LPSTR)szBuf, 256, NULL); break;
-			case 3: mciSendString((LPSTR)"open sound/wall4.wav type waveaudio alias snd wait", (LPSTR)szBuf, 256, NULL); break;
+			case 0: PlaySound("sound/wall1.wav", NULL, SND_ASYNC); break;
+			case 1: PlaySound("sound/wall2.wav", NULL, SND_ASYNC); break;
+			case 2: PlaySound("sound/wall3.wav", NULL, SND_ASYNC); break;
+			case 3: PlaySound("sound/wall4.wav", NULL, SND_ASYNC); break;
 			}
 			mciSendString((LPSTR)"play snd", (LPSTR)szBuf, 256, NULL);
 		}
@@ -301,7 +299,7 @@ void PROCESS::MoveBomb( int numb_p, int numb_b ){
 }
 bool PROCESS::PushBomb( int i ){
 	int y = player[i]->GetPos().first, x = player[i]->GetPos().second;
-	if( Find( y, x, "BOMB" ) == -1 && player[i]->GetBonus( "AB" ) && Find( y, x, "BRICK" ) == -1  ){
+	if( Find( y, x, "BOMB" ) == -1 && player[i]->GetBonus( "AB" ) && Find( y, x, "BRICK" ) == -1 && Find( y, x, "FIRE" ) == -1  ){
 		BYTE szBuf[256];
 		mciSendString((LPSTR)"close snd", (LPSTR)szBuf, 256, NULL);
 		mciSendString((LPSTR)"open sound/beep.wav type waveaudio alias snd wait", (LPSTR)szBuf, 256, NULL);
@@ -580,6 +578,7 @@ int PROCESS::Find( int y, int x, string temp ){
 	}
 }*/
 void PROCESS::GameStart(){
+	//if( level > 8 ) level = 0;
 	if( IfEmpty() ){
 		LevelGenerate( ++level );
 	}
@@ -591,15 +590,17 @@ void PROCESS::GameProcess(){
 	BombTime();
 	MoveMoobs();
 	Print();
-	LevelComplite();
+	//LevelComplite();
 }
-void PROCESS::LevelComplite(){
+bool PROCESS::LevelComplite(){
 	DestroyFire();
 	if( !moob.size() ){
+		player[0]->undead = 30;
+		player[0]->score += 10000;
 		PlaySound("sound/win.wav", NULL, SND_ASYNC);
-		Sleep( 3000 );
-		Clear();
+		return true;
 	}
+	return false;
 }
 void PROCESS::ResetPlayer( int i ){
 	if( player[0]->life && !player[0]->undead ){

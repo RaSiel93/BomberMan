@@ -25,7 +25,7 @@ public:
 
 	void				GameStart();
 	void				GameProcess();
-	void				LevelComplite();
+	bool				LevelComplite();
 	bool				GameOver();
 	void				ResetPlayer( int i = 0 );
 	void				Clear();
